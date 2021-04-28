@@ -214,9 +214,13 @@ violin_plot=violin_plot+stat_summary(fun.data = data_summary,position = position
 violin_plot=violin_plot+scale_fill_manual(values=c(col_values[1],col_values[4]))
 
 cor(unlist(conc_df$ScoresMin),unlist(conc_df$APM))
+df_APM=data.frame(ScM=unlist(conc_df$ScoresMin),APM=unlist(conc_df$APM))
 q=qplot(unlist(conc_df$ScoresMin),unlist(conc_df$APM))+labs(x="Scores Per Minute",y="Action Per Minute")+geom_smooth()+theme_classic()
+q
+hexbin_chart=ggplot(df_APM,aes(x=ScM,y=APM))+geom_hex()+theme_bw()
+hexbin_chart
 
-  
+
 df_t=df_test_melt
 df_t$Day=NA
 df_t$Day[df_t$Day=="D5"]="D"
