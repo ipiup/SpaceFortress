@@ -1,5 +1,5 @@
 #CLEAN_SF MAIN
-source("Clean_SF.R")
+source("Clean\\Clean_SF.R")
 library("stringr")
 library("foreach")
 #Path choice
