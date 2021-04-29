@@ -32,7 +32,7 @@ for(str_pseudo in unique(df_APM_ScM$Pseudo)){
  }
 
 # #Data scores cumul?s
-# df_data=read_data_score(fil_clean)
+#df_data=read_data_score(fil_clean)
 # 
 # df_data$SD=sapply(df_data$CumulScore,sd)
 # df_data$SDPoint=sapply(df_data$Point,sd)

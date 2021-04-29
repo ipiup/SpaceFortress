@@ -290,3 +290,12 @@ read_data_score<-function(files_data,add_press=FALSE){
   df_data=as.data.frame(df_data)
   return(df_data)
 }
+
+read_final_Score<-function(files_data){
+  df_data=foreach(i=1:length(files_data),.combine = rbind)%dopar%{
+    file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
+    data.frame(file$Pseudo[1],file$Session[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]))
+    }
+  colnames(df_data)=c("Pseudo","Session","TotalScore","Flight","Bonus","Mine","Fortress")
+  return(df_data)
+}
