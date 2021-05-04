@@ -9,7 +9,7 @@ df_APM_mean=df_APM%>%
 cor(df_APM$ScM,df_APM$APM)
 
 q=ggplot(df_APM,aes(ScM,APM,color=Treatment))+labs(x="Scores Per Minute",y="Action Per Minute")+geom_point(data=transform(df_APM,Session=NULL),color="grey85")+geom_point()+theme_classic()
-q+facet_wrap(vars(Session),ncol=2)+stat_mean(aes(color=Treatment),color="red",size=5)
+q+facet_wrap(vars(Session),ncol=2)+stat_mean(aes(shape=Treatment),size=5)
 
 hexbin_chart=ggplot(df_APM,aes(x=ScM,y=APM))+geom_hex()+theme_bw()
 hexbin_chart

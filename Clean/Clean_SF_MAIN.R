@@ -5,9 +5,9 @@ library("foreach")
 #Path choice
 path=choose.dir(default = "", caption = "Participants file")#ALL FILES non clean files path
 fil=list.files(path=path,recursive = T) # files pattern : "^SpaceFortress-5.1.0(.*).txt$")
-path_clean="E:\\ISAE-2021\\Alldata\\Data_Clean\\"#CLEANFILES
+path_clean="E:\\ISAE-2021\\Alldata\\Data_Clean"#CLEANFILES
 #Clean File with points writing
-invisible(lapply(fil,write_file))
+invisible(lapply(fil,write_file,path=path,path_clean=path_clean))
 
 #CLEAN FILES : compute scores/min and APM
 

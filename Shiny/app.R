@@ -1,63 +1,75 @@
 library(shiny)
 library(shinyFiles)
 
-
-d=read.table("C:\\Users\\Chamery\\Documents\\Shiny_SF testshinyfile.txt")
-n="cc.txt"
-
-fun_test(d,"C:\\Users\\Chamery\\Documents\\test.txt")
-fun_test<-function(f,pth){
-  write.table(f,pth)
+fun_clean<-function(path,path_clean){
+  fil=list.files(path=path,recursive = T)
+  print(fil)
+  lapply(fil,write_file,path=path,path_clean=path_clean)
 }
 
-ui <- fluidPage( # Application title
-  mainPanel(
-    shinyDirButton("dir", "Input directory", "Upload"),
-    verbatimTextOutput("dir", placeholder = TRUE),
-    textInput("filename","Choose a file name"),
-    actionButton("namego","go"),
-    textOutput("b"),
+ui <- fluidPage(
+  titlePanel("Space Fortress Data Extraction"),
+  
+  sidebarLayout(
+    sidebarPanel(
+    #Raw File directory
+    shinyDirButton("dir_raw", "Raw File directory", "Upload"),
+    verbatimTextOutput("dir_raw", placeholder = TRUE),
+    #Clean File directory
+    shinyDirButton("dir_clean", "Clean File directory", "Upload"),
+    verbatimTextOutput("dir_clean", placeholder = TRUE),
+    # textInput("filename","Choose a file name"),
+    # actionButton("namego","go"),
+    # textOutput("b"),
     actionButton("filego","write")
+  ),
+  mainPanel(
+    tabsetPanel(
+      tabPanel("Plot", plotOutput("plot")), 
+      tabPanel("Summary", verbatimTextOutput("summary")), 
+      tabPanel("Table", tableOutput("table"))
+    )
+  )
   ))
 
 server <- function(input, output) {
-  shinyDirChoose(input,'dir',roots = c(wd = 'C:'),filetypes = c('', 'txt'))
+  shinyDirChoose(input,'dir_raw',roots = c(files = "E:"),filetypes = c('', 'txt'))
+  shinyDirChoose(input,'dir_clean',roots = c(files = 'E:'),filetypes = c('', 'txt'))
   
   global <- reactiveValues(datapath = "")#getwd())
-  
-  dir <- reactive(input$dir)
-  
-  filename<-reactive(input$filename)
-  
-  output$dir <- renderText({
+  dir_raw <- reactive(input$dir_raw)
+  output$dir_raw <- renderText({
     global$datapath
   })
-  output$filename<-renderText(input$filename)
-  
-  output$b<-renderText(inpu$dir)
   observeEvent(
     ignoreNULL = TRUE,
-               eventExpr = {input$dir},
-               handlerExpr = {
-                 if (!"path" %in% names(dir())) return()
-                 home <- normalizePath("~")
-                 global$datapath <-
-                   normalizePath(file.path(home))#,paste(unlist(dir()$path[-1])), collapse = .Platform$file.sep))
-               }
-    )
-
+    eventExpr = {input$dir_raw},
+    handlerExpr = {
+      if (!"path" %in% names(dir_raw())) return()
+      global$datapath <-
+        normalizePath(file.path("E:\\", paste(unlist(dir_raw()$path[-1]), collapse = .Platform$file.sep)))
+      
+    }
+  )
   
-  # output$txt_out<-renderText({global$datapath
-  #   #write.table("blablabla",paste(global$datapath,"testshinyfile.txt"))
-  #   })
-  #reac<-eventReactive(input$namego,{input$filename})
-  #output$b<-renderText({reac()})
-  #observe(print(paste0(global$datapath,"\\",input$filename,".txt")))
-  #observe(fun_test(d,global$datapath))
-  #reac<-eventReactive(input$namego,{print(paste0(global$datapath,"\\",input$filename,".txt"))})
-  reac_n<-eventReactive(input$namego,{paste0(global$datapath,"\\",input$filename,".txt")})
-  output$b<-renderText({reac_n()})
-  reac<-eventReactive(input$filego,{fun_test(d,reac_n())})
+  global_cl<-reactiveValues(datapath = "")#getwd())
+  dir_clean <- reactive(input$dir_clean)
+  output$dir_clean <- renderText({
+    global_cl$datapath
+  })
+
+  observeEvent(
+    ignoreNULL = TRUE,
+    eventExpr = {input$dir_clean},
+    handlerExpr = {
+      if (!"path" %in% names(dir_clean())) return()
+      global_cl$datapath <-
+        normalizePath(file.path("E:\\", paste0(unlist(dir_clean()$path[-1]), collapse = .Platform$file.sep)))
+    }
+  )
+
+  reac<-eventReactive(input$filego,{fun_clean(global$datapath,global_cl$datapath)})
+  #reac<-eventReactive(input$filego,{print(global_cl$datapath)})
   observe(reac())
 }
 

@@ -53,7 +53,7 @@ clean_file <- function(file_to_clean){
 }
 
 #write files containing the clean dataframe of each session of each participant 
-write_file<-function(file){
+write_file<-function(file,path,path_clean){
   file_to_write=read.table(paste0(path,"\\",file), header=TRUE, sep="\t",dec=".",fill=TRUE)
   id=ID(file) #ID of the participant
   dat=date_hour(file) #date of the session
@@ -78,7 +78,7 @@ write_file<-function(file){
     file_to_save$Session=session
     file_to_save=file_to_save[c(5,6,7,1,2,3,4)] #change order or the columns
     file_to_save=compute_points(file_to_save) #compute points of the session and add columns including points details
-    write.table(file_to_save, paste0(path_clean,"SpaceFortress_",id,"_",session,".txt"),append = FALSE, sep = "\t", dec = ".",row.names = TRUE, col.names = TRUE,quote=FALSE)
+    write.table(file_to_save, paste0(path_clean,"\\SpaceFortress_",id,"_",session,".txt"),append = FALSE, sep = "\t", dec = ".",row.names = TRUE, col.names = TRUE,quote=FALSE)
   }
   return(id)
 }
