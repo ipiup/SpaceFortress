@@ -106,7 +106,7 @@ compute_points<-function(file_to_read, point_only=FALSE){# if df_return = False,
   #Fortress destruction
   dp$Type[dp$e1=="destroyed"&dp$e2=="fortress"]="FortressDestruction"
   dp$Point[dp$e1=="destroyed"&dp$e2=="fortress"]=250
-  # #Friends Mines destruction
+  # #Friends Mines destruction (false version)
   # dp$Type[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="50"]="FriendMineDestruction"
   # dp$Point[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="50"]=60
   # #Foes Mines destruction
