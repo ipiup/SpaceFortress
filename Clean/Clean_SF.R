@@ -106,12 +106,21 @@ compute_points<-function(file_to_read, point_only=FALSE){# if df_return = False,
   #Fortress destruction
   dp$Type[dp$e1=="destroyed"&dp$e2=="fortress"]="FortressDestruction"
   dp$Point[dp$e1=="destroyed"&dp$e2=="fortress"]=250
+  # #Friends Mines destruction
+  # dp$Type[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="50"]="FriendMineDestruction"
+  # dp$Point[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="50"]=60
+  # #Foes Mines destruction
+  # dp$Type[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="60"]="FoeMineDestruction"
+  # dp$Point[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="60"]=50 #INVERSION?
+  # #Mine disappears
+  # dp$Type[dp$e1=="timeout"&dp$e2=="mine"]="MineExtinction"
+  # dp$Point[dp$e1=="timeout"&dp$e2=="mine"]=-50
   #Friends Mines destruction
-  dp$Type[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="50"]="FriendMineDestruction"
-  dp$Point[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="50"]=60
+  dp$Type[dp$e1=="collide"&dp$e2=="friend_mine"]="FriendMineDestruction"
+  dp$Point[dp$e1=="collide"&dp$e2=="friend_mine"]=50
   #Foes Mines destruction
-  dp$Type[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="60"]="FoeMineDestruction"
-  dp$Point[dp$e1=="score+"&dp$e2=="mines"&dp$e3=="60"]=50 #INVERSION?
+  dp$Type[dp$e1=="collide"&dp$e2=="tagged_foe_mine"]="FoeMineDestruction"
+  dp$Point[dp$e1=="collide"&dp$e2=="tagged_foe_mine"]=60 
   #Mine disappears
   dp$Type[dp$e1=="timeout"&dp$e2=="mine"]="MineExtinction"
   dp$Point[dp$e1=="timeout"&dp$e2=="mine"]=-50
