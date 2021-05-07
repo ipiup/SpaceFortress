@@ -1,13 +1,13 @@
 library("ggplot2")
 library("ggpubr")
 
-ggdensity(df_APM_ScM$TotalScore)+geom_histogram(binwidth = 250,color="lightblue")
-p1=ggdensity(df_APM_ScM$Flight)+geom_histogram(binwidth = 100)
+ggdensity(final_df$TotalScore)+geom_histogram(binwidth = 250,color="lightblue")
+p1=ggdensity(final_df$Flight)+geom_histogram(binwidth = 100)
 
-p1=ggdensity(unlist(df_APM_ScM$FlightScore))+geom_histogram(binwidth = 10)+xlab("Flight Score")
-p2=ggdensity(df_APM_ScM$Bonus)+geom_histogram(binwidth = 100)+xlab("Bonus Score")
-p3=ggdensity(df_APM_ScM$Mine)+geom_histogram(binwidth = 100)+xlab("Mine Score")
-p4=ggdensity(df_APM_ScM$Fortress)+geom_histogram(binwidth = 200)+xlab("Fortress Score")
+p1=ggdensity(unlist(final_df$Flight))+geom_histogram(binwidth = 100)+xlab("Flight Score")
+p2=ggdensity(final_df$Bonus)+geom_histogram(binwidth = 100)+xlab("Bonus Score")
+p3=ggdensity(final_df$Mine)+geom_histogram(binwidth = 100)+xlab("Mine Score")
+p4=ggdensity(final_df$Fortress)+geom_histogram(binwidth = 200)+xlab("Fortress Score")
 figure=ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
 figure
 
@@ -121,5 +121,3 @@ pwc
 pwc=pwc%>%add_xy_position(x="Session")
 bxp+stat_pvalue_manual(pwc,tip.length=0,hide.ns=TRUE)+labs(subtitle=get_test_label(res.aov,detailed=TRUE),
                                                            caption=get_pwc_label(pwc))
-
-

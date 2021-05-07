@@ -318,8 +318,8 @@ read_final_Score<-function(files_data){
     file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
     prct_bonus=(sum(file$Type=="ShotsBonusCapture"|file$Type=="PointsBonusCapture")*100)/sum(file$Type=="NewBonus")
     prct_mine=(sum(file$Type=="FriendMineDestruction"|file$Type=="FoeMineDestruction")*100)/sum(file$Type=="NewMine")
-    data.frame(file$Pseudo[1],file$Session[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),prct_bonus,prct_mine)
+    data.frame(file$Date[1],file$Session[1],file$Pseudo[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),sum(file$Type=="NewBonus"),sum(file$Type=="NewMine"),prct_bonus,prct_mine)
     }
-  colnames(df_data)=c("Pseudo","Session","TotalScore","Flight","Bonus","Mine","Fortress","Bonus_Prct","Mine_Prct")
+  colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress","NumberofBonus","NumberofMine","Bonus_Prct","Mine_Prct")
   return(df_data)
 }

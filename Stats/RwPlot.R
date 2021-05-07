@@ -44,6 +44,3 @@ ZScore_plot=ggplot(gen_data_P2,aes(Day,Zscore,color=Treatment))+geom_boxplot(out
 #Figure
 figure=ggarrange(Total_Score_plot,ZScore_plot,Flight_Score_plot,Fortress_Score_plot,Bonus_Score_plot,Mine_Score_plot,ncol=2,nrow=3,common.legend = TRUE)
 figure
-
-
-

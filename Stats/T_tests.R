@@ -3,7 +3,7 @@ library(ggplot2)
 library(ggpubr)
 library(ggsci)
 #T-tests
-gen_data=subset(df_APM_ScM,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
+gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 
 score_names=c("TotalScore","Flight","Bonus","Mine","Fortress")
 

@@ -23,9 +23,9 @@ df_APM_ScM=subset(df_APM_ScM,Pseudo!="EC1603"&Pseudo!="LM2411")
 
 conc_df=concatenate(df_APM_ScM)
 
-df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
-for(str_pseudo in unique(df_APM_ScM$Pseudo)){
-  df_APM_ScM$Treatment[df_APM_ScM$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
+  df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
+for(str_pseudo in unique(final_df$Pseudo)){
+  final_df$Treatment[final_df$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
 }
  for(str_pseudo in unique(df_demographique$identifiant)){
    df_demographique$Treatment[df_demographique$identifiant==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
@@ -42,7 +42,7 @@ for(str_pseudo in unique(df_APM_ScM$Pseudo)){
 # df_data$SDFortress=sapply(df_data$FortressPoint,sd)
 # 
 #General data
-gen_data=subset(df_APM_ScM,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
+gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 gen_data=subset(gen_data,Pseudo!="EC1603"&Pseudo!="LM2411")
 
 #Add Day on gen_data
@@ -56,3 +56,8 @@ gen_data$Zscore=z_score
 gen_data_P2=subset(gen_data,grepl("P2",Session)|Session=="D01P1")
 
 final_df=read_final_Score(fil_clean)
+final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411")
+
+
+df_leaderboard$MinePrct=(df_leaderboard$DestroyedMines*100)/df_leaderboard$NumberofMines
+df_leaderboard$BonusPrct=(df_leaderboard$CapturedBonuses*100)/df_leaderboard$NumberofBonuses
