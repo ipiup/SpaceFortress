@@ -68,7 +68,7 @@ write_file<-function(file,path,path_clean){
       file_to_save$Session=session
       file_to_save=file_to_save[c(5,6,7,1,2,3,4)] #change order or the columns
       file_to_save=compute_points(file_to_save) #compute points of the session and add columns including points details
-      write.table(file_to_save, paste0(path_clean,"SpaceFortress_",id,"_",session,".txt"), append = FALSE, sep = "\t", dec = ".",row.names = TRUE, col.names = TRUE,quote=FALSE)
+      write.table(file_to_save, paste0(path_clean,"\\SpaceFortress_",id,"_",session,".txt"), append = FALSE, sep = "\t", dec = ".",row.names = TRUE, col.names = TRUE,quote=FALSE)
     }
   }else{#TLS or MTP J1
     session=get_day_session(file,path)
@@ -84,10 +84,9 @@ write_file<-function(file,path,path_clean){
 }
 
 #compute points of one session of one participant and return a dataframe (or the points only if point_only=TRUE)
-compute_points<-function(file_to_read, point_only=FALSE){# if df_return = False, return the total score
+compute_points<-function(file_to_read, point_only=FALSE,press=FALSE,prct=TRUE){# if df_return = False, return the total score
   e1=file_to_read$e1
-  dp=subset(file_to_read,e1=="press"|e1=="collide"|e1=="destroyed"|e1=="warp"|e1=="score+"|e1=="timeout"|e1=="pnts_bonus_capture"|e1=="pnts_bonus_failure"|e1=="shots_bonus_capture"|e1=="shots_bonus_failure"
-            ,select=c("Date","Session","Pseudo","system_time","e1","e2","e3"))
+  dp=subset(file_to_read,e1=="press"|e1=="new_mine"|e1=="bonus_available"|e1=="collide"|e1=="destroyed"|e1=="warp"|e1=="score+"|e1=="timeout"|e1=="pnts_bonus_capture"|e1=="pnts_bonus_failure"|e1=="shots_bonus_capture"|e1=="shots_bonus_failure",select=c("Date","Session","Pseudo","system_time","e1","e2","e3"))
   dp$Type=NA
   dp$Point=0
   dp$Group=NA
@@ -124,6 +123,9 @@ compute_points<-function(file_to_read, point_only=FALSE){# if df_return = False,
   #Mine disappears
   dp$Type[dp$e1=="timeout"&dp$e2=="mine"]="MineExtinction"
   dp$Point[dp$e1=="timeout"&dp$e2=="mine"]=-50
+  # #Collision with a mine
+  # dp$Type[dp$e1=="collide"& (dp$e2=="shell"|dp$e2=="mine_0")]="MineCollision"
+  # dp$Point
   #Points Bonus capture
   dp$Type[dp$e1=="pnts_bonus_capture"]="PointsBonusCapture"
   dp$Point[dp$e1=="pnts_bonus_capture"]=100
@@ -133,6 +135,12 @@ compute_points<-function(file_to_read, point_only=FALSE){# if df_return = False,
   #Bonus failure
   dp$Type[dp$e1=="pnts_bonus_failure"|dp$e1=="shots_bonus_failure"]="BonusFailure"
   dp$Point[dp$e1=="pnts_bonus_failure"|dp$e1=="shots_bonus_failure"]=-50
+  #New Mine
+  dp$Type[dp$e1=="new_mine"]="NewMine"
+  dp$Point[dp$e1=="new_mine"]=0
+  #New Bonus
+  dp$Type[dp$e1=="bonus_available"]="NewBonus"
+  dp$Point[dp$e1=="bonus_available"]=0
   #Group of Scores
   dp$Group[dp$Type=="ShipDamage"|dp$Type=="ShipDestruction"|dp$Type=="BorderCrossing"|dp$Type=="FortressCollision"]="Flight"
   dp$Group[dp$Type=="FortressDestruction"]="Fortress"
@@ -140,12 +148,17 @@ compute_points<-function(file_to_read, point_only=FALSE){# if df_return = False,
   dp$Group[dp$Type=="PointsBonusCapture"|dp$Type=="ShotsBonusCapture"|dp$Type=="BonusFailure"]="Bonus"
   dp$Group[dp$e1=="press"]="Press"
   dp$Type[dp$e1=="press"]="Press"
+  dp$Type[dp$e1=="new_mine"]="NewMine"
+  dp$Type[dp$e1=="bonus_available"]="NewBonus"
+  dp$Group[dp$e1=="new_mine"|dp$e1=="bonus_available"]="GameEvent"
   dp=subset(dp,!is.na(Type),select=c("Date","Session","Pseudo","system_time","e1","e2","e3","Type","Point","Group"))
-  if(point_only==TRUE){
+  if(point_only==TRUE&press==FALSE){
     #return(dp$Point[e1!="press"]) #returns the points only
     return(subset(dp,e1!="press",select=c("Group","Point")))
-  }else{
+  }else if(prct==TRUE){
     return(dp)
+  }else{
+    return(subset(dp,e1!="new_mine"|e1!="bonus_available"))
   }
 }
 
@@ -303,8 +316,10 @@ read_data_score<-function(files_data,add_press=FALSE){
 read_final_Score<-function(files_data){
   df_data=foreach(i=1:length(files_data),.combine = rbind)%dopar%{
     file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
-    data.frame(file$Pseudo[1],file$Session[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]))
+    prct_bonus=(sum(file$Type=="ShotsBonusCapture"|file$Type=="PointsBonusCapture")*100)/sum(file$Type=="NewBonus")
+    prct_mine=(sum(file$Type=="FriendMineDestruction"|file$Type=="FoeMineDestruction")*100)/sum(file$Type=="NewMine")
+    data.frame(file$Pseudo[1],file$Session[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),prct_bonus,prct_mine)
     }
-  colnames(df_data)=c("Pseudo","Session","TotalScore","Flight","Bonus","Mine","Fortress")
+  colnames(df_data)=c("Pseudo","Session","TotalScore","Flight","Bonus","Mine","Fortress","Bonus_Prct","Mine_Prct")
   return(df_data)
 }

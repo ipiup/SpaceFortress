@@ -5,7 +5,7 @@ library("foreach")
 #Path choice
 path=choose.dir(default = "", caption = "Participants file")#ALL FILES non clean files path
 fil=list.files(path=path,recursive = T) # files pattern : "^SpaceFortress-5.1.0(.*).txt$")
-path_clean="E:\\ISAE-2021\\Alldata\\Data_Clean"#CLEANFILES
+path_clean="E:\\ISAE-2021\\Alldata\\Data_Clean_NEW"#CLEANFILES
 #Clean File with points writing
 invisible(lapply(fil,write_file,path=path,path_clean=path_clean))
 
@@ -55,3 +55,4 @@ gen_data$Zscore=z_score
 
 gen_data_P2=subset(gen_data,grepl("P2",Session)|Session=="D01P1")
 
+final_df=read_final_Score(fil_clean)
