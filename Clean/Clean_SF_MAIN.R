@@ -42,6 +42,9 @@ for(str_pseudo in unique(final_df$Pseudo)){
 # df_data$SDFortress=sapply(df_data$FortressPoint,sd)
 # 
 #General data
+  
+final_df=read_final_Score(fil_clean)
+final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411")
 gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 gen_data=subset(gen_data,Pseudo!="EC1603"&Pseudo!="LM2411")
 
@@ -54,9 +57,6 @@ z_score=scale(gen_data$TotalScore)
 gen_data$Zscore=z_score
 
 gen_data_P2=subset(gen_data,grepl("P2",Session)|Session=="D01P1")
-
-final_df=read_final_Score(fil_clean)
-final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411")
 
 
 df_leaderboard$MinePrct=(df_leaderboard$DestroyedMines*100)/df_leaderboard$NumberofMines
