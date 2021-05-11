@@ -148,7 +148,7 @@ bxp_LearningRate=ggboxplot(df,x="Treatment",y="LearningRate",color="Treatment",p
 bxp_LearningRate
 
 #######################
-#SAME BUT N0J14
+#SAME BUT N0J14 ON Zscore (of the total Score)
 gen_data$D=1:11
 gen_data_noJ14=subset(gen_data,Day!="D14")
 #fit_all=lm(Zscore~log(D),data=gen_data_noJ14)
