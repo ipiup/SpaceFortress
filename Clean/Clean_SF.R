@@ -141,16 +141,21 @@ compute_points<-function(file_to_read, point_only=FALSE,press=FALSE,prct=TRUE){#
   #New Bonus
   dp$Type[dp$e1=="bonus_available"]="NewBonus"
   dp$Point[dp$e1=="bonus_available"]=0
+  #Missile collide Fortress
+  dp$Type[dp$e1=="collide"&dp$e3=="fortress"]="FortressShot"
+  dp$Point[dp$e1=="collide"&dp$e3=="fortress"]=0
   #Group of Scores
   dp$Group[dp$Type=="ShipDamage"|dp$Type=="ShipDestruction"|dp$Type=="BorderCrossing"|dp$Type=="FortressCollision"]="Flight"
-  dp$Group[dp$Type=="FortressDestruction"]="Fortress"
+  dp$Group[dp$Type=="FortressDestruction"|dp$Type=="FortressShot"]="Fortress"
   dp$Group[dp$Type=="FriendMineDestruction"|dp$Type=="FoeMineDestruction"|dp$Type=="MineExtinction"]="Mine"
   dp$Group[dp$Type=="PointsBonusCapture"|dp$Type=="ShotsBonusCapture"|dp$Type=="BonusFailure"]="Bonus"
+  dp$Group[dp$Type=="FortressShot"]="Bonus"
   dp$Group[dp$e1=="press"]="Press"
   dp$Type[dp$e1=="press"]="Press"
-  dp$Type[dp$e1=="new_mine"]="NewMine"
-  dp$Type[dp$e1=="bonus_available"]="NewBonus"
-  dp$Group[dp$e1=="new_mine"|dp$e1=="bonus_available"]="GameEvent"
+
+  dp$Group[dp$e1=="new_mine"|dp$e1=="bonus_available"|dp$Type=="FortressShot"]="GameEvent"
+
+  
   dp=subset(dp,!is.na(Type),select=c("Date","Session","Pseudo","system_time","e1","e2","e3","Type","Point","Group"))
   if(point_only==TRUE&press==FALSE){
     #return(dp$Point[e1!="press"]) #returns the points only
@@ -318,8 +323,8 @@ read_final_Score<-function(files_data){
     file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
     prct_bonus=(sum(file$Type=="ShotsBonusCapture"|file$Type=="PointsBonusCapture")*100)/sum(file$Type=="NewBonus")
     prct_mine=(sum(file$Type=="FriendMineDestruction"|file$Type=="FoeMineDestruction")*100)/sum(file$Type=="NewMine")
-    data.frame(file$Date[1],file$Session[1],file$Pseudo[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),sum(file$Type=="NewBonus"),sum(file$Type=="NewMine"),prct_bonus,prct_mine)
+    data.frame(file$Date[1],file$Session[1],file$Pseudo[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),sum(file$Type=="NewBonus"),sum(file$Type=="NewMine"),prct_bonus,prct_mine,sum(file$Type=="FortressShot"))
     }
-  colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress","NumberofBonus","NumberofMine","Bonus_Prct","Mine_Prct")
+  colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress","NumberofBonus","NumberofMine","Bonus_Prct","Mine_Prct","FortressShot")
   return(df_data)
 }
