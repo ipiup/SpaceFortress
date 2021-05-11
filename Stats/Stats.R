@@ -121,3 +121,11 @@ pwc
 pwc=pwc%>%add_xy_position(x="Session")
 bxp+stat_pvalue_manual(pwc,tip.length=0,hide.ns=TRUE)+labs(subtitle=get_test_label(res.aov,detailed=TRUE),
                                                            caption=get_pwc_label(pwc))
+
+#Cor Nb of Shots/ fortress Score
+cor(final_df$Fortress,final_df$FortressShot)
+ggscatter(final_df,x="Fortress",y="FortressShot",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
+#ratio
+final_df$FortressRatio=((final_df$Fortress/250)/final_df$FortressShot)*10
+ggscatter(final_df,x="FortressRatio",y="Fortress",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
+ggdensity(final_df$FortressRatio)+geom_histogram(binwidth = 0.01)

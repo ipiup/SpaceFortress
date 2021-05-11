@@ -35,6 +35,7 @@ q2=ggqqplot(final_df$Mine_ASin)+xlab("Mine Score")
 q3=ggqqplot(final_df$Fortress_ASin)+xlab("Fortress Score")
 figure_ASin=ggarrange(p1,q1,p2,q2,p3,q3,ncol=2,nrow=3)
 figure_ASin
+
 #ARCSIN(SQRT) TRANSFORMATION
 final_df$Flight_ASinSqrt=asin(sqrt(final_df$Flight_Inv/100000))
 final_df$Mine_ASinSqrt=asin(sqrt(final_df$Mine_Scale/100000))
@@ -104,7 +105,7 @@ final_df$ZFortress=scale(final_df$Fortress_YeoJ)
 final_df$ZMean=rowMeans(subset(final_df,select=c("ZMine","ZFortress","ZBonus","ZFlight")))
 cor(final_df$TotalScore,final_df$ZMean)
 zmean_tot_plot=ggscatter(final_df,x="TotalScore",y="ZMean",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
-
+zmean_tot_plot
 
 p1=ggdensity(final_df$ZFlight)+geom_histogram(binwidth = 0.1)+xlab("Flight Score")
 p2=ggdensity(final_df$ZBonus)+geom_histogram(binwidth = 0.1)+xlab("Bonus Score")
