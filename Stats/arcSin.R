@@ -102,6 +102,9 @@ final_df$ZBonus=scale(final_df$Bonus)
 final_df$ZFortress=scale(final_df$Fortress_YeoJ)
 
 final_df$ZMean=rowMeans(subset(final_df,select=c("ZMine","ZFortress","ZBonus","ZFlight")))
+cor(final_df$TotalScore,final_df$ZMean)
+zmean_tot_plot=ggscatter(final_df,x="TotalScore",y="ZMean",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
+
 
 p1=ggdensity(final_df$ZFlight)+geom_histogram(binwidth = 0.1)+xlab("Flight Score")
 p2=ggdensity(final_df$ZBonus)+geom_histogram(binwidth = 0.1)+xlab("Bonus Score")

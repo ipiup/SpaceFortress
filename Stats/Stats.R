@@ -7,7 +7,7 @@ p1=ggdensity(final_df$Flight)+geom_histogram(binwidth = 100)
 p1=ggdensity(final_df$Flight)+geom_histogram(binwidth = 100)+xlab("Flight Score")
 p2=ggdensity(final_df$Bonus)+geom_histogram(binwidth = 100)+xlab("Bonus Score")
 p3=ggdensity(final_df$Mine)+geom_histogram(binwidth = 200)+xlab("Mine Score")
-p4=ggdensity(final_df$Mine_Scale)+geom_histogram(binwidth=200)+xlab("Fortress Score")
+p4=ggdensity(final_df$Fortress)+geom_histogram(binwidth=200)+xlab("Fortress Score")
 figure=ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
 figure
 
