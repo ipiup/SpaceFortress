@@ -4,14 +4,14 @@ library("ggpubr")
 ggdensity(final_df$TotalScore)+geom_histogram(binwidth = 250,color="lightblue")
 p1=ggdensity(final_df$Flight)+geom_histogram(binwidth = 100)
 
-p1=ggdensity(unlist(final_df$Flight))+geom_histogram(binwidth = 100)+xlab("Flight Score")
+p1=ggdensity(final_df$Flight)+geom_histogram(binwidth = 100)+xlab("Flight Score")
 p2=ggdensity(final_df$Bonus)+geom_histogram(binwidth = 100)+xlab("Bonus Score")
-p3=ggdensity(final_df$Mine)+geom_histogram(binwidth = 100)+xlab("Mine Score")
-p4=ggdensity(final_df$Fortress)+geom_histogram(binwidth = 200)+xlab("Fortress Score")
+p3=ggdensity(final_df$Mine)+geom_histogram(binwidth = 200)+xlab("Mine Score")
+p4=ggdensity(final_df$Mine_Scale)+geom_histogram(binwidth=200)+xlab("Fortress Score")
 figure=ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
 figure
 
-ggdensity(unlist(df_APM_ScM$ScoresMin))+geom_histogram(binwidth = 35)+xlab("Score")
+ggdensity(final_df$Mine_Scale)+geom_histogram(binwidth = 0.1)+xlab("Score")
 
 library("tidyverse")
 

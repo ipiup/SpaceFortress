@@ -53,3 +53,4 @@ pca$var$cor
 summary(pca)
 library(xtable)
 xtable(pca$var$cor)
+
