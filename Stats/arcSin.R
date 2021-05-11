@@ -4,6 +4,8 @@ library(e1071)#for skewness
 library(dplyr)
 library(BBmisc)
 
+final_df$Zscore=scale(final_df$TotalScore)
+
 #SKEWNESS
 skewness(final_df$Flight)
 skewness(final_df$Mine)
@@ -43,7 +45,7 @@ final_df$Fortress_ASinSqrt=asin(sqrt(final_df$Fortress/100000))
 
 p1=ggdensity(final_df$Flight_ASinSqrt)+geom_histogram(binwidth=0.005)+xlab("Flight Score")
 p2=ggdensity(final_df$Mine_ASinSqrt)+geom_histogram(binwidth=0.005)+xlab("Mine Score")
-p3=ggdensity(final_df$Fortress_ASinSqrt)+geom_histogram(binwidth=0.005)+xlab("Fortress Score")
+p3=ggdensity(final_df$Fortress_ASinSqrt)+geom_histogram(binwidth=0.015)+xlab("Fortress Score")
 q1=ggqqplot(final_df$Flight_ASinSqrt)+xlab("Flight Score")
 q2=ggqqplot(final_df$Mine_ASinSqrt)+xlab("Mine Score")
 q3=ggqqplot(final_df$Fortress_ASinSqrt)+xlab("Fortress Score")
@@ -72,7 +74,7 @@ final_df$Fortress_LOG=log10(final_df$Fortress)
 
 p1=ggdensity(final_df$Flight_LOG)+geom_histogram(binwidth=0.1)+xlab("Flight Score")
 p2=ggdensity(final_df$Mine_LOG)+geom_histogram(binwidth=0.1)+xlab("Mine Score")
-p3=ggdensity(final_df$Fortress_LOG)+geom_histogram(binwidth=0.1)+xlab("Fortress Score")
+p3=ggdensity(final_df$Fortress_LOG)+geom_histogram(binwidth=0.05)+xlab("Fortress Score")
 q1=ggqqplot(final_df$Flight_LOG)+xlab("Flight Score")
 q2=ggqqplot(final_df$Mine_LOG)+xlab("Mine Score")
 q3=ggqqplot(final_df$Fortress_LOG)+xlab("Fortress Score")
@@ -82,29 +84,32 @@ figure_LOG
 #YEO JOHNSON
 #first method
 library(bestNormalize)
-final_df$Flight_YeoJ=yeojohnson(final_df$Flight,standardize = TRUE)$x.t
+final_df$Flight_YeoJ=yeojohnson(final_df$Flight)$x.t
+final_df$Bonus_YeoJ=yeojohnson(final_df$Bonus)$x.t
 final_df$Mine_YeoJ=yeojohnson(final_df$Mine,standardize = TRUE)$x.t
 final_df$Fortress_YeoJ=yeojohnson(final_df$Fortress,standardize = TRUE)$x.t
 
 p1=ggdensity(final_df$Flight_YeoJ)+geom_histogram(binwidth=0.1)+xlab("Flight Score")
 p2=ggdensity(final_df$Mine_YeoJ)+geom_histogram(binwidth=0.1)+xlab("Mine Score")
-p3=ggdensity(final_df$Fortress_YeoJ)+geom_histogram(binwidth=0.1)+xlab("Fortress Score")
+p3=ggdensity(final_df$Fortress_YeoJ)+geom_histogram(binwidth=0.15)+xlab("Fortress Score")
+p4=ggdensity(final_df$Bonus_YeoJ)+geom_histogram(binwidth=0.15)+xlab("Bonus Score")
 q1=ggqqplot(final_df$Flight_YeoJ)+xlab("Flight Score")
 q2=ggqqplot(final_df$Mine_YeoJ)+xlab("Mine Score")
 q3=ggqqplot(final_df$Fortress_YeoJ)+xlab("Fortress Score")
-figure_YeoJ=ggarrange(p1,q1,p2,q2,p3,q3,ncol=2,nrow=3)
+q4=ggqqplot(final_df$Bonus)+xlab("Bonus Score")
+figure_YeoJ=ggarrange(p1,q1,p2,q2,p3,q3,p4,q4,ncol=2,nrow=4)
 figure_YeoJ
 
 
 #ZSubScore
 final_df$ZFlight=scale(final_df$Flight_YeoJ)
 final_df$ZMine=scale(final_df$Mine_YeoJ)
-final_df$ZBonus=scale(final_df$Bonus)
+final_df$ZBonus=scale(final_df$Bonus_YeoJ)
 final_df$ZFortress=scale(final_df$Fortress_YeoJ)
 
 final_df$ZMean=rowMeans(subset(final_df,select=c("ZMine","ZFortress","ZBonus","ZFlight")))
 cor(final_df$TotalScore,final_df$ZMean)
-zmean_tot_plot=ggscatter(final_df,x="TotalScore",y="ZMean",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
+zmean_tot_plot=ggscatter(final_df,x="Zscore",y="ZMean",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
 zmean_tot_plot
 
 p1=ggdensity(final_df$ZFlight)+geom_histogram(binwidth = 0.1)+xlab("Flight Score")

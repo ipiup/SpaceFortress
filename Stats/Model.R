@@ -93,7 +93,65 @@ bxp_LearningRate=ggboxplot(df,x="Treatment",y="LearningRate",color="Treatment",p
 #SAME BUT N0J14
 gen_data$D=1:11
 gen_data_noJ14=subset(gen_data,Day!="D14")
-fit_all=lm(Zscore~log(D),data=gen_data_noJ14)
+#fit_all=lm(ZMean~log(D),data=gen_data_noJ14)
+fit_all=lm(ZMean~ln(D),data=gen_data_noJ14)
+fit_all_lin=lm(ZMean~D,data=gen_data_noJ14)
+coef(fit_all_lin)
+summary(fit_all)
+coef(fit_all)
+a1=coef(fit_all)[1]
+a2=coef(fit_all)[2]
+x0=exp(a1)
+mu=a2
+eq=paste0("Equation: ZMean= ",round(a1,4)," + ",round(a2,4),"*ln(D)")
+
+plot_ln=ggplot(gen_data_noJ14,aes(ln(D),ZMean))+geom_point()+theme_classic2()+annotate("text",label=eq,x=0.5,y=2)+
+  geom_abline(intercept=coef(fit_all)[1],slope=coef(fit_all)[2],col="blue")+stat_summary(geom="point",col="red",fun="mean",size=3)+labs(x="ln(Day)")
+
+plot_lnreg=ggplot(gen_data_noJ14,aes(D,ZMean))+geom_point()+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+  stat_smooth(method=lm,formula=y~ln(x))+stat_summary(geom="point",col="red",fun="mean",size=3)+labs(x="Day")+
+  scale_x_continuous(breaks=1:11)
+
+plot_linreg=ggplot(gen_data_noJ14,aes(D,ZMean))+geom_point()+theme_classic2()+annotate("text",label=paste("Equation :","y~x"),x=3,y=2)+
+  stat_smooth(method=lm,formula=y~x)+stat_summary(geom="point",col="red",fun="mean",size=3)+labs(x="Day")+
+  scale_x_continuous(breaks=1:11)
+
+figure_reg=ggarrange(plot_ln,ggarrange(plot_linreg,plot_lnreg,ncol=2,labels=c("B","C")),labels=c("A"),nrow=2)
+figure_reg
+
+#Akaike Information Criterion
+AIC(fit_all)
+AIC(fit_all_lin)
+
+by_pseudo=gen_data_noJ14%>%
+  group_by(Pseudo)
+by_pseudo_noJ14=subset(by_pseudo,Day!="D14")
+
+lnreg_pseudo=do(by_pseudo_noJ14,tidy(lm(ZMean~ln(D),data=.)))
+
+intercept_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="(Intercept)"]
+slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
+
+df_Zmean=data.frame(ZMeanD1=gen_data_noJ14$ZMean[gen_data_noJ14$Day=="D01"],LearningRate=slope_pseudo)
+
+cor(df$ZMeanD1,df$LearningRate)
+ggplot(df,aes(ZMeanD1,LearningRate),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
+  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZMean")
+
+fit_ZMeaninitial=lm(LearningRate~ZMeanD1,data=df)
+summary(fit_ZMeaninitial)
+coef(fit_ZMeaninitial)
+
+df=data.frame(Pseudo=gen_data_noJ14$Pseudo[gen_data_noJ14$Day=="D01"],Treatment=gen_data_noJ14$Treatment[gen_data_noJ14$Day=="D01"],ZMeanD1=gen_data_noJ14$ZMean[gen_data_noJ14$Day=="D01"],LearningRate=slope_pseudo)
+t_test_learningrate=t.test(df$LearningRate[df$Treatment==1],df$LearningRate[df$Treatment==2])
+bxp_LearningRate=ggboxplot(df,x="Treatment",y="LearningRate",color="Treatment",palette="jco",add="jitter")+labs(x="Group",y="LearningRate",title="LearningRate")+stat_compare_means(method="t.test",label.x = 1.35, label.y = 0.9*max(df$LearningRate))+rremove("legend")
+bxp_LearningRate
+
+#######################
+#SAME BUT N0J14
+gen_data$D=1:11
+gen_data_noJ14=subset(gen_data,Day!="D14")
+#fit_all=lm(Zscore~log(D),data=gen_data_noJ14)
 fit_all=lm(Zscore~ln(D),data=gen_data_noJ14)
 fit_all_lin=lm(Zscore~D,data=gen_data_noJ14)
 coef(fit_all_lin)
@@ -122,6 +180,9 @@ figure_reg
 #Akaike Information Criterion
 AIC(fit_all)
 AIC(fit_all_lin)
+
+by_pseudo=gen_data_noJ14%>%
+  group_by(Pseudo)
 by_pseudo_noJ14=subset(by_pseudo,Day!="D14")
 
 lnreg_pseudo=do(by_pseudo_noJ14,tidy(lm(Zscore~ln(D),data=.)))
@@ -129,16 +190,17 @@ lnreg_pseudo=do(by_pseudo_noJ14,tidy(lm(Zscore~ln(D),data=.)))
 intercept_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="(Intercept)"]
 slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
 
-df=data.frame(ZscoreD1=gen_data$Zscore[gen_data$Day=="D01"],LearningRate=slope_pseudo)
+df=data.frame(ZscoreD1=gen_data_noJ14$Zscore[gen_data_noJ14$Day=="D01"],LearningRate=slope_pseudo)
 cor(df$ZscoreD1,df$LearningRate)
 ggplot(df,aes(ZscoreD1,LearningRate),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
   geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial Zscore")
 
-fit_zscoreinitial=lm(LearningRate~ZscoreD1,data=df)
-summary(fit_zscoreinitial)
-coef(fit_zscoreinitial)
+fit_Zscoreinitial=lm(LearningRate~ZscoreD1,data=df)
+summary(fit_Zscoreinitial)
+coef(fit_Zscoreinitial)
 
-df=data.frame(Pseudo=gen_data$Pseudo[gen_data$Day=="D01"],Treatment=gen_data$Treatment[gen_data$Day=="D01"],ZscoreD1=gen_data$Zscore[gen_data$Day=="D01"],LearningRate=slope_pseudo)
+df=data.frame(Pseudo=gen_data_noJ14$Pseudo[gen_data_noJ14$Day=="D01"],Treatment=gen_data_noJ14$Treatment[gen_data_noJ14$Day=="D01"],ZscoreD1=gen_data_noJ14$Zscore[gen_data_noJ14$Day=="D01"],LearningRate=slope_pseudo)
 t_test_learningrate=t.test(df$LearningRate[df$Treatment==1],df$LearningRate[df$Treatment==2])
 bxp_LearningRate=ggboxplot(df,x="Treatment",y="LearningRate",color="Treatment",palette="jco",add="jitter")+labs(x="Group",y="LearningRate",title="LearningRate")+stat_compare_means(method="t.test",label.x = 1.35, label.y = 0.9*max(df$LearningRate))+rremove("legend")
 bxp_LearningRate
+
