@@ -23,9 +23,8 @@ df_APM_ScM=subset(df_APM_ScM,Pseudo!="EC1603"&Pseudo!="LM2411")
 
 conc_df=concatenate(df_APM_ScM)
 
-
- for(str_pseudo in unique(df_demographique$identifiant)){
-   df_demographique$Treatment[df_demographique$identifiant==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
+ for(str_pseudo in unique(df_APM_ScM$Pseudo)){
+   df_APM_ScM$Treatment[df_APM_ScM$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
  }
 
 # #Data scores cumul?s

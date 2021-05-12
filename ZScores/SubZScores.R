@@ -42,13 +42,13 @@ gen_data$Zscore_Fortress=as.numeric(scale(gen_data$Fortress))
 #PCA on ZSubScores
 #install.packages("factoextra")
 library("factoextra")
-gen_data_subZ=subset(gen_data,select=c("Zscore_Flight","Zscore_Bonus","Zscore_Mine","Zscore_Fortress"))
-gen_data_sub=subset(gen_data,select=c("Flight","Bonus","Mine","Fortress"))
-res.pca=prcomp(gen_data[,c("Zscore_Flight","Zscore_Bonus","Zscore_Mine","Zscore_Fortress")])
+
+res.pca=prcomp(final_df[,c("ZFlight","ZBonus","ZMine","ZFortress")])
 fviz_eig(res.pca)
 
 library(FactoMineR)
-pca=PCA(gen_data_sub,ncp=3)
+gen_data_subZ=subset(final_df,select=c("ZFlight","ZBonus","ZMine","ZFortress"))
+pca=PCA(gen_data_subZ,ncp=3)
 pca$var$cor
 summary(pca)
 library(xtable)
