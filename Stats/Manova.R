@@ -38,10 +38,11 @@ summary.aov(manova_model) #same as one way anova on each dependent variable
 #RM Package
 library(MANOVA.RM)
 gen_data_P2_noJ14=subset(gen_data_P2,Day!="D14")
-manova_RM=MANOVA.RM::RM(Zscore~Treatment*Day,data=gen_data_P2,subject="Pseudo")
+manova_RM=MANOVA.RM::RM(ZMean~Treatment*Day,data=gen_data_P2,subject="Pseudo")
 
-manova_RM_noJ14=MANOVA.RM::RM(Zscore~Treatment*Day,data=gen_data_P2_noJ14,subject="Pseudo")
+manova_RM_noJ14=MANOVA.RM::RM(ZMean~Treatment*Day,data=gen_data_P2_noJ14,subject="Pseudo")
 summary(manova_RM_noJ14)
+
 manova_=MANOVA(D01*D02*D03*D04*D05*D14~Treatment,data=gen_data_P2_cast,subject="Pseudo")
 summary(manova_)
 manova_wide=MANOVA.wide(Zscore,Treatment*Day,data=gen_data_P2,subject="Pseudo")
@@ -50,8 +51,8 @@ manova_wide=MANOVA.wide(Zscore,Treatment*Day,data=gen_data_P2,subject="Pseudo")
 library(rstatix)
 #tukey
 tukey_per_group=gen_data_P2%>%
-  group_by(Treatment)%>%
-  tukey_hsd(Zscore~Day)
+  group_by(Day)%>%
+  tukey_hsd(ZMean~Treatment)
 
 tukey=tukey_hsd(gen_data_P2,Zscore~Day)
 tukey_noJ14=tukey_hsd(gen_data_P2_noJ14,Zscore~Day)

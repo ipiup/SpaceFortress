@@ -4,9 +4,10 @@ df_APM=subset(df_APM, !grepl("P1",Session)|Session=="D01P1") #keep second sessio
 df_APM$Session=substr(df_APM$Session,1,3)
 df_APM$Treatment=as.factor(df_APM$Treatment)
 df_APM$Session=as.factor(df_APM$Session)
-df_APM_mean=df_APM%>%
+
+df_APM%>%
   group_by(Treatment,Session)%>%
-  summarise(m=mean)
+  summarise(mean(APM))
 cor(df_APM$ScM,df_APM$APM)
 
 q=ggplot(df_APM,aes(ScM,APM,color=Treatment))+labs(x="Scores Per Minute",y="Action Per Minute")+geom_point(data=transform(df_APM,Session=NULL),color="grey85")+geom_point()+theme_classic()
