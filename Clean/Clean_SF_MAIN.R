@@ -45,10 +45,10 @@ df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
 for(str_pseudo in unique(final_df$Pseudo)){
   final_df$Treatment[final_df$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
 }
-final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411",select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress,FortressShot))
+final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411",select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 
-gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress,ZMean))
-gen_data=subset(gen_data,Pseudo!="EC1603"&Pseudo!="LM2411")
+gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress,ZMean,Zscore))
+#gen_data=subset(gen_data,Pseudo!="EC1603"&Pseudo!="LM2411")
 
 #Add Day on gen_data
 gen_data$Day=substring(gen_data$Session,1,3)
