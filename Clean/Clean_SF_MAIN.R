@@ -5,15 +5,25 @@ library("foreach")
 #Path choice
 path=choose.dir(default = "", caption = "Participants file")#ALL FILES non clean files path
 fil=list.files(path=path,recursive = T) # files pattern : "^SpaceFortress-5.1.0(.*).txt$")
-path_clean="E:\\ISAE-2021\\Alldata\\Data_Clean_NEW"#CLEANFILES
+path_clean="E:\\ISAE-2021\\Alldata\\Data_Clean"#CLEANFILES
 #Clean File with points writing
 invisible(lapply(fil,write_file,path=path,path_clean=path_clean))
 
-#CLEAN FILES : compute scores/min and APM
-
 fil_clean=list.files(path=path_clean,recursive = T)
-path_ScM_APM="E:\\ISAE-2021\\Alldata\\ScM_SubScores_APM\\"
+#General data
 
+final_df=read_final_Score(fil_clean)
+
+df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
+for(str_pseudo in unique(final_df$Pseudo)){
+  final_df$Treatment[final_df$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
+}
+#Outliers
+final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
+
+#####
+#CLEAN FILES : compute scores/min and APM
+path_ScM_APM="E:\\ISAE-2021\\Alldata\\ScM_SubScores_APM\\"
 #df_APM_ScM=lapply(fil_clean,scores_apm_fct)
 #write_APM_ScM(fil_clean) #Matrix: APM and Scores per Minute of Participants, for each session
 fil_APM_ScM=list.files(path=path_ScM_APM,recursive = T)
@@ -21,6 +31,7 @@ df_APM_ScM=read_APM_ScM(fil_APM_ScM)
 df_APM_ScM=subset(df_APM_ScM,Pseudo!="EC1603"&Pseudo!="LM2411")
 #df_APM_ScM$RollSD=lapply(df_APM_ScM$ScoresMin,moving_sd_ttr, mov_point=60)
 
+#####
 conc_df=concatenate(df_APM_ScM)
 
  for(str_pseudo in unique(df_APM_ScM$Pseudo)){
@@ -37,17 +48,9 @@ conc_df=concatenate(df_APM_ScM)
 # df_data$SDMine=sapply(df_data$MinePoint,sd)
 # df_data$SDFortress=sapply(df_data$FortressPoint,sd)
 # 
-#####
-#General data
-  
-final_df=read_final_Score(fil_clean)
-df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
-for(str_pseudo in unique(final_df$Pseudo)){
-  final_df$Treatment[final_df$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
-}
-final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411",select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 
-gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress,ZMean,Zscore))
+#####
+gen_data=subset(final_df,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))#,ZMean,Zscore
 #gen_data=subset(gen_data,Pseudo!="EC1603"&Pseudo!="LM2411")
 
 #Add Day on gen_data
@@ -60,11 +63,12 @@ gen_data$Zscore=z_score
 
 gen_data_P2=subset(gen_data,grepl("P2",Session)|Session=="D01P1")
 
-
+#####
 df_leaderboard$MinePrct=(df_leaderboard$DestroyedMines*100)/df_leaderboard$NumberofMines
 df_leaderboard$BonusPrct=(df_leaderboard$CapturedBonuses*100)/df_leaderboard$NumberofBonuses
 
 ################
 #ADD Group 3 pseudo to group file
 hd_Pseudo=unique(unlist(lapply(fil,ID)))
+#!!! BS1410 & JT0601Grp 2, JA2904 Grp1
 write.table(data.frame(hd_Pseudo,rep(3,times=length(hd_Pseudo))),"E:\\ISAE-2021\\Alldata\\Group3.txt",quote = FALSE,row.names = FALSE,sep="\t")

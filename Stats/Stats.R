@@ -129,3 +129,9 @@ ggscatter(final_df,x="Fortress",y="FortressShot",add="reg.line", add.params = li
 final_df$FortressRatio=((final_df$Fortress/250)/final_df$FortressShot)*10
 ggscatter(final_df,x="FortressRatio",y="Fortress",add="reg.line", add.params = list(color = "blue", fill = "lightgray"),conf.int = TRUE )+stat_cor(method="pearson")
 ggdensity(final_df$FortressRatio)+geom_histogram(binwidth = 0.01)
+
+
+#####
+final_df_D14=subset(final_df,Session=="D14P1"|Session=="D14P2")
+anova_test(final_df_D14,dv=TotalScoreSub,wid=Pseudo,within=Session,between = Treatment)
+
