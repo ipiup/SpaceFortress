@@ -47,7 +47,6 @@ manova_=MANOVA(D01*D02*D03*D04*D05*D14~Treatment,data=gen_data_P2_cast,subject="
 summary(manova_)
 manova_wide=MANOVA.wide(Zscore,Treatment*Day,data=gen_data_P2,subject="Pseudo")
 
-
 library(rstatix)
 #tukey
 tukey_per_group=gen_data_P2%>%

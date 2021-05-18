@@ -26,7 +26,7 @@ conc_df=concatenate(df_APM_ScM)
  for(str_pseudo in unique(df_APM_ScM$Pseudo)){
    df_APM_ScM$Treatment[df_APM_ScM$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
  }
-
+###############
 # #Data scores cumul?s
 #df_data=read_data_score(fil_clean)
 # 
@@ -37,6 +37,7 @@ conc_df=concatenate(df_APM_ScM)
 # df_data$SDMine=sapply(df_data$MinePoint,sd)
 # df_data$SDFortress=sapply(df_data$FortressPoint,sd)
 # 
+#####
 #General data
   
 final_df=read_final_Score(fil_clean)
@@ -62,3 +63,8 @@ gen_data_P2=subset(gen_data,grepl("P2",Session)|Session=="D01P1")
 
 df_leaderboard$MinePrct=(df_leaderboard$DestroyedMines*100)/df_leaderboard$NumberofMines
 df_leaderboard$BonusPrct=(df_leaderboard$CapturedBonuses*100)/df_leaderboard$NumberofBonuses
+
+################
+#ADD Group 3 pseudo to group file
+hd_Pseudo=unique(unlist(lapply(fil,ID)))
+write.table(data.frame(hd_Pseudo,rep(3,times=length(hd_Pseudo))),"E:\\ISAE-2021\\Alldata\\Group3.txt",quote = FALSE,row.names = FALSE,sep="\t")

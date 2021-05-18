@@ -227,3 +227,11 @@ t_test_learningrate=t.test(df$LearningRate[df$Treatment==1],df$LearningRate[df$T
 bxp_LearningRate=ggboxplot(df,x="Treatment",y="LearningRate",color="Treatment",palette="jco",add="jitter")+labs(x="Group",y="LearningRate",title="LearningRate")+stat_compare_means(method="t.test",label.x = 1.35, label.y = 0.9*max(df$LearningRate))+rremove("legend")
 bxp_LearningRate
 
+
+
+
+
+
+
+
+
