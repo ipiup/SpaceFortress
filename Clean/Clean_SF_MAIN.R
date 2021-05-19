@@ -19,7 +19,7 @@ for(str_pseudo in unique(final_df$Pseudo)){
   final_df$Treatment[final_df$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
 }
 #Outliers
-final_df=subset(final_df,Pseudo!="EC1603"&Pseudo!="LM2411")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
+final_df=subset(final_df,Pseudo!="LM2411")#Pseudo!="EC1603"&&Pseudo!="JT0601")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 
 #####
 #CLEAN FILES : compute scores/min and APM

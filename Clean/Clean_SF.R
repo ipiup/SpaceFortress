@@ -319,7 +319,7 @@ read_data_score<-function(files_data,add_press=FALSE){
 }
 
 read_final_Score<-function(files_data){
-  df_data=foreach(i=1:length(files_data),.combine = rbind)%dopar%{
+  df_data=foreach(i=1:length(files_data),.combine = rbind)%do%{
     file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
     prct_bonus=(sum(file$Type=="ShotsBonusCapture"|file$Type=="PointsBonusCapture")*100)/sum(file$Type=="NewBonus")
     prct_mine=(sum(file$Type=="FriendMineDestruction"|file$Type=="FoeMineDestruction")*100)/sum(file$Type=="NewMine")

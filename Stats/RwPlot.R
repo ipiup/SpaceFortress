@@ -57,15 +57,17 @@ for(i in unique(mean_TotalScore$GROUP)){
 
 for(str_pseudo in unique(final_df$Pseudo)){
   final_df$TotalScoreSub[final_df$Pseudo==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo]-final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D01P1"]
-}
+  }
 
 final_mean=ggplot(mean_TotalScore,aes(Session,TotalScoreMean,color=GROUP,group=GROUP))+geom_point()+theme_classic2()+geom_line(aes(color=mean_TotalScore$GROUP))
 
 final_df$Treatment=as.factor(final_df$Treatment)
 
-boxplot_final=ggplot(final_df,aes(Session,TotalScoreSub,color=GROUP))+geom_boxplot()+theme_classic2()+geom_point(aes(color=GROUP),position=position_dodge(width = 0.75))
-boxplot_final
 #1: STIM SD, 2 SHAM, 3 STIM HD
 final_df$GROUP[final_df$Treatment==1]="02SD"
 final_df$GROUP[final_df$Treatment==2]="01SHAM"
 final_df$GROUP[final_df$Treatment==3]="03HD"
+boxplot_final
+ggplot(final_df,aes(Session,TotalScore,color=GROUP))+geom_boxplot()+theme_classic2()+geom_point(aes(color=GROUP),position=position_dodge(width = 0.75))+scale_color_discrete(name="Groups",labels=c("SHAM","SD","HD"))
+boxplot_final
+

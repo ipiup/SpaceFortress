@@ -133,5 +133,30 @@ ggdensity(final_df$FortressRatio)+geom_histogram(binwidth = 0.01)
 
 #####
 final_df_D14=subset(final_df,Session=="D14P1"|Session=="D14P2")
+for(str_pseudo in unique(final_df_D14$Pseudo)){
+  final_df_D14$D01[final_df_D14$Pseudo==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D01P1"]
+}
 anova_test(final_df_D14,dv=TotalScoreSub,wid=Pseudo,within=Session,between = Treatment)
+final_df_D14%>%tukey_hsd(TotalScoreSub~GROUP)
 
+
+for(str_pseudo in unique(final_df$Pseudo)){
+  # data_dem$Score_J6_partie2[data_dem$identifiant==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D14P2"]
+  final_df$GameLevel[final_df$Pseudo==str_pseudo]=data_dem$sum_JV[data_dem$identifiant==str_pseudo]
+}
+
+final_df_D14=subset(final_df,Session="D14P2")
+ggplot(final_df,aes(Treatment,GameLevel))+geom_boxplot()+theme_classic2()+geom_point()
+
+#ANCOVA A DEUX FACTEURS
+final_df%>%anova_test(TotalScore~GameLevel+Treatment*Session)
+
+posthov=final_df%>%group_by(Session)%>%anova_test(TotalScore~GameLevel+Treatment)
+
+final_df_D14=subset(final_df_D14,Session=="D14P2")
+ggplot(final_df_D14,aes(GameLevel,TotalScore,color=Treatment))+theme_classic2()+geom_point()
+
+
+m=lm(TotalScore~Treatment*GameLevel,data=final_df_D14) 
+summary(m)
+ggPredict(m,interactive = TRUE)
