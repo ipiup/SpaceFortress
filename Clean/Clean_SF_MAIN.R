@@ -21,6 +21,8 @@ for(str_pseudo in unique(final_df$Pseudo)){
 #Outliers
 final_df=subset(final_df,Pseudo!="LM2411")#Pseudo!="EC1603"&&Pseudo!="JT0601")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 
+data_dem=read.csv("D:\\ISAE-2021\\2021_05_19_RawData_tRNS_study.csv",head=TRUE,dec = ",",sep=";")
+
 #####
 #CLEAN FILES : compute scores/min and APM
 path_ScM_APM="E:\\ISAE-2021\\Alldata\\ScM_SubScores_APM\\"

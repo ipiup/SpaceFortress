@@ -68,6 +68,7 @@ final_df$GROUP[final_df$Treatment==1]="02SD"
 final_df$GROUP[final_df$Treatment==2]="01SHAM"
 final_df$GROUP[final_df$Treatment==3]="03HD"
 boxplot_final
-ggplot(final_df,aes(Session,TotalScore,color=GROUP))+geom_boxplot()+theme_classic2()+geom_point(aes(color=GROUP),position=position_dodge(width = 0.75))+scale_color_discrete(name="Groups",labels=c("SHAM","SD","HD"))
+ggplot(final_df,aes(Session,TotalScoreSub,color=GROUP))+geom_boxplot()+theme_classic2()+geom_point(aes(color=GROUP),position=position_dodge(width = 0.75))+scale_color_discrete(name="Groups",labels=c("SHAM","SD","HD"))+labs(title="Boxplot des Scores Totaux avec Soustraction de la Baseline")
+
 boxplot_final
 

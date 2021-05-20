@@ -137,26 +137,67 @@ for(str_pseudo in unique(final_df_D14$Pseudo)){
   final_df_D14$D01[final_df_D14$Pseudo==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D01P1"]
 }
 anova_test(final_df_D14,dv=TotalScoreSub,wid=Pseudo,within=Session,between = Treatment)
-final_df_D14%>%tukey_hsd(TotalScoreSub~GROUP)
+final_df_D14%>%tukey_hsd(TotalScoreSub~Treatment)
 
+final_df$Pseudo[final_df$Pseudo=="SL2804"]="SL0804"
 
 for(str_pseudo in unique(final_df$Pseudo)){
-  # data_dem$Score_J6_partie2[data_dem$identifiant==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D14P2"]
+  #data_dem$Score_J6_partie2[data_dem$identifiant==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D14P2"]
   final_df$GameLevel[final_df$Pseudo==str_pseudo]=data_dem$sum_JV[data_dem$identifiant==str_pseudo]
 }
 
 final_df_D14=subset(final_df,Session="D14P2")
+final_df$Treatment=as.factor(final_df$Treatment)
 ggplot(final_df,aes(Treatment,GameLevel))+geom_boxplot()+theme_classic2()+geom_point()
 
 #ANCOVA A DEUX FACTEURS
-final_df%>%anova_test(TotalScore~GameLevel+Treatment*Session)
+final_df_noJ1=subset(final_df,Session!="D01P1")
+final_df_noJ1%>%anova_test(TotalScoreSub~GameLevel+Treatment*Session)
 
-posthov=final_df%>%group_by(Session)%>%anova_test(TotalScore~GameLevel+Treatment)
+posthoc=final_df_noJ1%>%group_by(Session)%>%anova_test(TotalScoreSub~GameLevel+Treatment)
+
 
 final_df_D14=subset(final_df_D14,Session=="D14P2")
-ggplot(final_df_D14,aes(GameLevel,TotalScore,color=Treatment))+theme_classic2()+geom_point()
+ggplot(final_df_D14,aes(GameLevel,TotalScore,color=Treatment))+theme_classic2()+geom_point()+geom_smooth(method="lm",se=FALSE,fullrange=TRUE)+labs(title="GameLevel depending on TotalScore for D14P2")
 
-
+install.packages("ggiraphExtra")
+library("ggiraphExtra")
 m=lm(TotalScore~Treatment*GameLevel,data=final_df_D14) 
 summary(m)
-ggPredict(m,interactive = TRUE)
+ggPredict(m,interactive = FALSE)+labs(title="TotalScore~Treatment*GameLevel")
+
+######
+#SAME WITH ZMEAN
+final_df_D14_ZMean=subset(final_df,Session=="D14P1"|Session=="D14P2")
+for(str_pseudo in unique(final_df_D14_ZMean$Pseudo)){
+  final_df_D14_ZMean$D01[final_df_D14_ZMean$Pseudo==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D01P1"]
+}
+anova_test(final_df_D14_ZMean,dv=ZMean,wid=Pseudo,within=Session,between = Treatment)
+final_df_D14_ZMean%>%tukey_hsd(ZMean~Treatment)
+
+final_df$Pseudo[final_df$Pseudo=="SL2804"]="SL0804"
+
+for(str_pseudo in unique(final_df$Pseudo)){
+  #data_dem$Score_J6_partie2[data_dem$identifiant==str_pseudo]=final_df$TotalScore[final_df$Pseudo==str_pseudo&final_df$Session=="D14P2"]
+  final_df$GameLevel[final_df$Pseudo==str_pseudo]=data_dem$sum_JV[data_dem$identifiant==str_pseudo]
+}
+
+final_df_D14_ZMean=subset(final_df,Session="D14P2")
+final_df$Treatment=as.factor(final_df$Treatment)
+ggplot(final_df,aes(Treatment,GameLevel))+geom_boxplot()+theme_classic2()+geom_point()
+
+#ANCOVA A DEUX FACTEURS
+final_df_noJ1=subset(final_df,Session!="D01P1")
+
+final_df%>%anova_test(ZMean~GameLevel+Treatment*Session)
+
+posthoc=final_df%>%group_by(Session)%>%anova_test(ZMean~GameLevel+Treatment)
+
+
+final_df_D14_ZMean=subset(final_df_D14_ZMean,Session=="D14P2")
+ggplot(final_df_D14_ZMean,aes(GameLevel,ZMean,color=Treatment))+theme_classic2()+geom_point()+geom_smooth(method="lm",se=FALSE,fullrange=TRUE)+labs(title="GameLevel depending on ZMean for D14P2")
+
+library("ggiraphExtra")
+m=lm(ZMean~Treatment*GameLevel,data=final_df_D14_ZMean) 
+summary(m)
+ggPredict(m,interactive = FALSE)+labs(title="ZMean~Treatment*GameLevel")
