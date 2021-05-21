@@ -328,3 +328,49 @@ read_final_Score<-function(files_data){
   colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress","NumberofBonus","NumberofMine","Bonus_Prct","Mine_Prct","FortressShot")
   return(df_data)
 }
+
+demographie<-function(final_df,df_demographique,ZMean=TRUE){
+  df_demographique$D01P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D01P1"]}))
+  df_demographique$D02P2=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D02P2"]}))
+  df_demographique$D03P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D03P1"]}))
+  df_demographique$D03P2=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D03P2"]}))
+  df_demographique$D04P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D04P1"]}))
+  df_demographique$D04P2=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D04P2"]}))
+  df_demographique$D05P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D05P1"]}))
+  df_demographique$D05P2=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D05P2"]}))
+  df_demographique$D14P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D14P1"]}))
+  df_demographique$D14P2=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D14P2"]}))
+  if(ZMean==TRUE){
+    df_demographique$D01P1ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D01P1"]}))
+    df_demographique$D02P2ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D02P2"]}))
+    df_demographique$D03P1ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D03P1"]}))
+    df_demographique$D03P2ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D03P2"]}))
+    df_demographique$D04P1ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D04P1"]}))
+    df_demographique$D04P2ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D04P2"]}))
+    df_demographique$D05P1ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D05P1"]}))
+    df_demographique$D05P2ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D05P2"]}))
+    df_demographique$D14P1ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D14P1"]}))
+    df_demographique$D14P2ZM=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$ZMean[final_df$Pseudo==x&final_df$Session=="D14P2"]}))
+  }
+  names(df_demographique)[names(df_demographique)=="Group..blind."]="BlindGroup"
+  names(df_demographique)[names(df_demographique)=="identifiant"]="Pseudo"
+  names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
+  names(df_demographique)[names(df_demographique)=="Votre.genre"]="Genre"
+  names(df_demographique)[names(df_demographique)=="sum_JV"]="GameLevel"
+  if(ZMean==TRUE){
+    df_demographique=subset(df_demographique,select=c("Pseudo","BlindGroup","Group","NET","GameLevel","Age",'Genre',"D01P1","D02P2","D03P1","D03P2","D04P1","D04P2","D05P1","D05P2","D14P1","D14P2","D01P1ZM","D02P2ZM","D03P1ZM","D03P2ZM","D04P1ZM","D04P2ZM","D05P1ZM","D05P2ZM","D14P1ZM","D14P2ZM"))
+  }else{
+    df_demographique=subset(df_demographique,select=c("Pseudo","BlindGroup","Group","NET","GameLevel","Age",'Genre',"D01P1","D02P2","D03P1","D03P2","D04P1","D04P2","D05P1","D05P2","D14P1","D14P2"))
+  }
+  return(df_demographique)
+}
+
+demographie_long<-function(final_df,df_demographique){
+  for(str_pseudo in unique(final_df$Pseudo)){
+    final_df$NET[final_df$Pseudo==str_pseudo]=df_demographique$NET[df_demographique$identifiant==str_pseudo]
+    final_df$GameLevel[final_df$Pseudo==str_pseudo]=df_demographique$sum_JV[df_demographique$identifiant==str_pseudo]
+    final_df$Age[final_df$Pseudo==str_pseudo]=df_demographique$Votre.âge[df_demographique$identifiant==str_pseudo]
+    final_df$Genre[final_df$Pseudo==str_pseudo]=df_demographique$Votre.genre[df_demographique$identifiant==str_pseudo]
+  }
+  return(final_df)
+}

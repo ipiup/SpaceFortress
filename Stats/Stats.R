@@ -201,3 +201,24 @@ library("ggiraphExtra")
 m=lm(ZMean~Treatment*GameLevel,data=final_df_D14_ZMean) 
 summary(m)
 ggPredict(m,interactive = FALSE)+labs(title="ZMean~Treatment*GameLevel")
+
+m=lmer(TotalScore~Group~Session+(1|Pseudo),data=as.matrix(final_df))
+f=as.matrix(final_df)
+
+df_J5J6=subset(final_df,Session=="D05P2"|Session=="D14P2")
+df_J5J6$Treatment=as.factor(df_J5J6$Treatment)
+df_J5J6$Session=as.factor(df_J5J6$Session)
+df_J5J6$Pseudo=as.factor(df_J5J6$Pseudo)
+
+
+library(lmerTest)
+modele.lmer5 <- lmer(TotalScore ~  Treatment + Session + Treatment:Session + (1|GameLevel), data=df_J5J6,  REML = F)
+summary(modele.lmer5)
+anova(modele.lmer5)
+
+##############DEMOGRAPHIQUE STAT ON 3 GROUPS
+df_demographique%>%
+  anova_test(GameLevel~as.factor(BlindGroup))
+summary(aov(data=df_demographique,GameLevel~as.factor(BlindGroup)))
+df_demographique%>%
+  tukey_hsd(GameLevel~as.factor(BlindGroup))
