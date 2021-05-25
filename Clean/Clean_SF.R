@@ -329,7 +329,7 @@ read_final_Score<-function(files_data){
   return(df_data)
 }
 
-demographie<-function(final_df,df_demographique,ZMean=TRUE){
+demographie<-function(final_df,df_demographique,ZMean){
   df_demographique$D01P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D01P1"]}))
   df_demographique$D02P2=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D02P2"]}))
   df_demographique$D03P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D03P1"]}))

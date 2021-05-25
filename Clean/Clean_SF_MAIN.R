@@ -20,11 +20,11 @@ for(str_pseudo in unique(final_df$Pseudo)){
 }
 #Outliers
 final_df=subset(final_df,Pseudo!="LM2411")#Pseudo!="EC1603"&&Pseudo!="JT0601")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
-
-df_demographique=read.csv("E:\\ISAE-2021\\2021_05_19_RawData_tRNS_study.csv",head=TRUE,dec = ",",sep=";")
-final_df=demographie_long(final_df,df_demographique)
-df_demographique=demographie(final_df ,df_demographique,TRUE)
-df_demographique=subset(df_demographique,Pseudo!="LM2411")#Pseudo!="EC1603"&&Pseudo!="JT0601")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
+final_df$Pseudo[final_df$Pseudo=="SL2804"]="SL0804"
+df_demographique=read.csv("D:\\ISAE-2021\\2021_05_19_RawData_tRNS_study.csv",head=TRUE,dec = ",",sep=";")
+data_long=demographie_long(final_df,df_demographique)
+data_wide=demographie(final_df ,df_demographique,FALSE)
+data_wide=subset(data_wide,Pseudo!="LM2411")#Pseudo!="EC1603"&&Pseudo!="JT0601")#,select=c(Date,Session,Pseudo,Treatment,TotalScore,Flight,Bonus,Mine,Fortress))
 
 #####
 #CLEAN FILES : compute scores/min and APM
