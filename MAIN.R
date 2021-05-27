@@ -18,7 +18,11 @@ fil=list.files(path=path,recursive = T) # files pattern : "^SpaceFortress-5.1.0(
 path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
 #Clean File with points writing
 invisible(lapply(fil,write_file,path=path,path_clean=path_clean)) #launch the cleaning
+
 ###BEGIN HERE IF DATA ALREADY CLEANED
+if(path_clean==""){#if path_clean was not asked yet 
+  path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
+}
 #CLEAN DATA READING
 fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
 data=read_final_Score(fil_clean) #Create the data 

@@ -371,6 +371,7 @@ demographie_long<-function(final_df,df_demographique){
     final_df$GameLevel[final_df$Pseudo==str_pseudo]=df_demographique$sum_JV[df_demographique$identifiant==str_pseudo]
     final_df$Age[final_df$Pseudo==str_pseudo]=df_demographique$Age[df_demographique$identifiant==str_pseudo]
     final_df$Genre[final_df$Pseudo==str_pseudo]=df_demographique$Votre.genre[df_demographique$identifiant==str_pseudo]
+    final_df$Group[final_df$Pseudo==str_pseudo]=df_demographique$Group[df_demographique$identifiant==str_pseudo]
   }
   return(final_df)
 }

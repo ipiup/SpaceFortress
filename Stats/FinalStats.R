@@ -6,11 +6,15 @@ library(dplyr)
 library(rstatix)
 library(ggsci)
 library(MANOVA.RM)
-
+library(viridis)
+library(hrbrthemes)
 #####
+data_wide$Group=factor(data_wide$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
+data_long$Group=factor(data_long$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
 #1.Descriptives STAT
 #1.1 Outliers Detection
-ggplot(data,aes(Session, TotalScore,color=as.factor(Treatment)))+geom_boxplot()+theme_classic2()+labs(color = "Group")
+plot_=ggplot(data_long,aes(Session, TotalScore,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
+set_palette(plot_,"jco")
 
 outliers=data%>%
   group_by(Session)%>%
@@ -20,15 +24,15 @@ outliers=data%>%
 #1.2 Données démographiques
 data_wide$Genre=as.factor(data_wide$Genre)
 
-bxp_NET=ggboxplot(data_wide,x="Group",y="NET",color="Group",palette="jco",add="jitter")+labs(x="Groups",y="NET",title="NET")+rremove("legend")
-bxp_GameLevel=ggboxplot(data_wide,x="Group",y="GameLevel",color="Group",palette="jco",add="jitter")+labs(x="Groups",y="GameLevel",title="Game Level")+rremove("legend")
-bxp_Age=ggboxplot(data_wide,x="Group",y="Age",color="Group",palette="jco",add="jitter")+labs(x="Group",y="Age",title="Age")+rremove("legend")
-bxp_ScoreJ1=ggboxplot(data_wide,x="Group",y="D01P1",color="Group",palette="jco",add="jitter")+labs(x="Groups",y="Score D1",title="First Score")+rremove("legend")
-bxp_ScoreJ6=ggboxplot(data_wide,x="Group",y="D14P2",color="Group",palette="jco",add="jitter")+labs(x="Groups",y="Score D14P2",title="Last Score")+rremove("legend")
-bxp_Gender=ggplot(data_wide,aes(as.factor(Group),group=as.factor(Genre),fill=as.factor(Genre)))+geom_bar(width=0.25)+theme_classic2()+theme(legend.title = element_blank(),legend.key.size =unit(0.1,"cm"))+labs(x="Gender",y=" ",title="Gender")+scale_fill_jco()
-
-ggarrange(bxp_NET,bxp_GameLevel,bxp_ScoreJ1,bxp_ScoreJ6,bxp_Age,bxp_Gender,ncol=2,nrow=3)
 #####
+bxp_NET=ggboxplot(data_wide,x="Group",y="NET",color="Group",palette="jco",add="jitter")+labs(x="",y="NET",title="NET")+rremove("legend")+stat_compare_means(method="anova",label.y=19)
+bxp_GameLevel=ggboxplot(data_wide,x="Group",y="GameLevel",color="Group",palette="jco",add="jitter")+labs(x="",y="GameLevel",title="Game Level")+rremove("legend")+stat_compare_means(method="anova",label.y=9)
+bxp_Age=ggboxplot(data_wide,x="Group",y="Age",color="Group",palette="jco",add="jitter")+labs(x="",y="Age",title="Age")+rremove("legend")+stat_compare_means(method="anova",label.y=35)
+bxp_ScoreJ1=ggboxplot(data_wide,x="Group",y="D01P1",color="Group",palette="jco",add="jitter")+labs(x="",y="Score D1",title="First Score")+rremove("legend")+stat_compare_means(method="anova",label.y=5000)
+bxp_ScoreJ6=ggboxplot(data_wide,x="Group",y="D14P2",color="Group",palette="jco",add="jitter")+labs(x="",y="Score D14P2",title="Last Score")+rremove("legend")+stat_compare_means(method="anova",label.y=20000)
+bxp_Gender=ggplot(data_wide,aes(as.factor(Group),group=as.factor(Genre),fill=as.factor(Genre)))+geom_bar(width=0.25)+theme_classic2()+theme(legend.title = element_blank(),legend.key.size =unit(0.1,"cm"),legend.position =c(0.4,1.1),legend.direction = "horizontal",legend.background = element_rect(fill ="transparent"),)+labs(x="",y=" ",title="Gender")+scale_fill_jco()
+
+ggarrange(bxp_NET,bxp_GameLevel,bxp_ScoreJ1,bxp_ScoreJ6,bxp_Age,bxp_Gender,ncol=2,nrow=3,align="v")
 #2.LEARNING RATE
 #2.1 D1-D14
 data_long$D=1:11
@@ -63,20 +67,27 @@ ggplot(data_wide,aes(D01P1ZM,LearningRateST),add="reg.line")+geom_point()+theme_
 GameD01=ggplot(data_wide,aes(D01P1,GameLevel),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+geom_smooth(method='lm',formula=y~x, se = FALSE)
 GameD05=ggplot(data_wide,aes(D05P2,GameLevel),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+geom_smooth(method='lm',formula=y~x, se = FALSE)
 GameD14=ggplot(data_wide,aes(D14P2,GameLevel),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+geom_smooth(method='lm',formula=y~x, se = FALSE)
-figure=ggarrange(GameD01,GameD05,GameD14,ncol=1,nrow=3,labels = c("D01","D05","D14"))
+figure=ggarrange(GameD01,GameD05,GameD14,ncol=1,nrow=3,labels = c("D01","D05","D14"),label.x=0.05)
 figure
 
 #Effect of GameLevel on the learning Rate
 GameLRST=ggplot(data_wide,aes(LearningRateST,GameLevel),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+geom_smooth(method='lm',formula=y~x, se = FALSE)
 GameLRLT=ggplot(data_wide,aes(LearningRateLT,GameLevel),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+geom_smooth(method='lm',formula=y~x, se = FALSE)
+figure=ggarrange(GameLRLT,GameLRST,ncol=1,nrow=2,labels=c("A","B"))
+figure
 
 #Effect of Stim on learning Rate Anova on three groups
-data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIM-SD","STIM-HD"))
+data_wide$Group=factor(data_wide$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
 data_wide%>%
-  anova_test(LearningRate~Group)
+  anova_test(LearningRateST~Group)
 
-ggplot(data_wide,aes(x=Group,LearningRateST,color=Group))+geom_boxplot()+theme_classic2()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova")
-ggplot(data_wide,aes(x=Group,LearningRate,color=Group))+geom_boxplot()+theme_classic2()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova")
+LRG_ST=ggplot(data_wide,aes(x=Group,LearningRateST,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova")
+LRG_LT=ggplot(data_wide,aes(x=Group,LearningRateLT,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova")
+LRG_ST=set_palette(LRG_ST,"jco")
+LRG_LT=set_palette(LRG_LT,"jco")
+figure=ggarrange(LRG_LT,LRG_ST,ncol=1,nrow=2,labels=c("A","B"))
+figure
+
 
 tukST=data_wide%>%
   tukey_hsd(LearningRateST~Group)
@@ -94,7 +105,18 @@ data_long_P2$Session=as.factor(data_long_P2$Session)
 data_long_P2$Pseudo=as.factor(data_long_P2$Pseudo)
 data_long_P2$GameLevel=as.factor(data_long_P2$GameLevel)
 
-manova=MANOVA.RM::RM(ZMean~Treatment*Session,data=data_long_P2,subject = "Pseudo")
+MANOVA.RM::RM(ZMean~GameLevel*Treatment*Session,data=data_long_P2,subject = "Pseudo")
+
+#ANOVA with Genre as covariable
+data_long_LT=subset(data_long,Session=="D05P2"|Session=="D14P2")
+data_long_LT$Session=as.factor(data_long_LT$Session)
+data_long_LT$Genre=as.factor(data_long_LT$Genre)
+data_long_LT$Treatment=as.factor(data_long_LT$Treatment)
+data_long_LT$GameLevel=as.factor(data_long_LT$GameLevel)
+
+data_long_LT%>%anova_test(ZMean~Treatment*Session+Genre)
+data_long_LT%>%tukey_hsd(ZMean~Treatment*Session+Genre)
+
 summary(manova)
 
 #ANCOVA
