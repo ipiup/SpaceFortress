@@ -354,7 +354,7 @@ demographie<-function(final_df,df_demographique,ZMean){
   }
   names(df_demographique)[names(df_demographique)=="Group..blind."]="BlindGroup"
   names(df_demographique)[names(df_demographique)=="identifiant"]="Pseudo"
-  names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
+  #names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
   names(df_demographique)[names(df_demographique)=="Votre.genre"]="Genre"
   names(df_demographique)[names(df_demographique)=="sum_JV"]="GameLevel"
   if(ZMean==TRUE){
@@ -369,8 +369,47 @@ demographie_long<-function(final_df,df_demographique){
   for(str_pseudo in unique(final_df$Pseudo)){
     final_df$NET[final_df$Pseudo==str_pseudo]=df_demographique$NET[df_demographique$identifiant==str_pseudo]
     final_df$GameLevel[final_df$Pseudo==str_pseudo]=df_demographique$sum_JV[df_demographique$identifiant==str_pseudo]
-    final_df$Age[final_df$Pseudo==str_pseudo]=df_demographique$Votre.âge[df_demographique$identifiant==str_pseudo]
+    final_df$Age[final_df$Pseudo==str_pseudo]=df_demographique$Age[df_demographique$identifiant==str_pseudo]
     final_df$Genre[final_df$Pseudo==str_pseudo]=df_demographique$Votre.genre[df_demographique$identifiant==str_pseudo]
   }
   return(final_df)
+}
+
+ZScores<-function(dl){
+  dl$ZScore=scale(dl$TotalScore)
+  #1 Yeo johnson transformation
+  dl$Flight_YeoJ=yeojohnson(dl$Flight)$x.t
+  dl$Bonus_YeoJ=yeojohnson(dl$Bonus)$x.t
+  dl$Mine_YeoJ=yeojohnson(dl$Mine,standardize = TRUE)$x.t
+  dl$Fortress_YeoJ=yeojohnson(dl$Fortress,standardize = TRUE)$x.t
+  #2ZSousScores
+  dl$ZFlight=scale(dl$Flight_YeoJ)
+  dl$ZMine=scale(dl$Mine_YeoJ)
+  dl$ZBonus=scale(dl$Bonus_YeoJ)
+  dl$ZFortress=scale(dl$Fortress_YeoJ)
+  #3 ZMean ( mean of the Sub ZScores)
+  dl$ZMean=rowMeans(subset(dl,select=c("ZMine","ZFortress","ZBonus","ZFlight")))
+  return(dl)
+}
+
+LearningRate<-function(dl,dw,shortTerm=FALSE){
+  dl$D=1:11
+  if(shortTerm==TRUE){
+    dl=subset(dl,Session!="D14P2"&Session!="D14P1")
+  }
+  fit_all=lm(ZMean~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
+  by_pseudo=dl%>%
+    group_by(Pseudo)
+  lnreg_pseudo=do(by_pseudo,tidy(lm(ZMean~ln(D),data=.)))
+  slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
+  if(shortTerm){
+    for(str_pseudo in unique(dw$Pseudo)){
+      dw$LearningRateST[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+    }
+  }else{
+    for(str_pseudo in unique(dw$Pseudo)){
+      dw$LearningRateLT[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+    }
+  }
+  return(dw)
 }
