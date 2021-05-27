@@ -11,6 +11,14 @@ library(hrbrthemes)
 #####
 data_wide$Group=factor(data_wide$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
 data_long$Group=factor(data_long$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
+data_long$Treatment=as.factor(data_long$Treatment)
+
+data_long_P2=subset(data_long,Session=="D01P1"|grepl("P2",Session))
+data_long_P2$Session=substring(data_long_P2$Session,1,3)
+data_long_P2$Treatment=as.factor(data_long_P2$Treatment)
+data_long_P2$Session=as.factor(data_long_P2$Session)
+data_long_P2$Pseudo=as.factor(data_long_P2$Pseudo)
+data_long_P2$GameLevel=as.factor(data_long_P2$GameLevel)
 #1.Descriptives STAT
 #1.1 Outliers Detection
 plot_=ggplot(data_long,aes(Session, TotalScore,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
@@ -33,6 +41,26 @@ bxp_ScoreJ6=ggboxplot(data_wide,x="Group",y="D14P2",color="Group",palette="jco",
 bxp_Gender=ggplot(data_wide,aes(as.factor(Group),group=as.factor(Genre),fill=as.factor(Genre)))+geom_bar(width=0.25)+theme_classic2()+theme(legend.title = element_blank(),legend.key.size =unit(0.1,"cm"),legend.position =c(0.4,1.1),legend.direction = "horizontal",legend.background = element_rect(fill ="transparent"),)+labs(x="",y=" ",title="Gender")+scale_fill_jco()
 
 ggarrange(bxp_NET,bxp_GameLevel,bxp_ScoreJ1,bxp_ScoreJ6,bxp_Age,bxp_Gender,ncol=2,nrow=3,align="v")
+
+#1.3Distributions ON P2
+ggdensity(data_long_P2$TotalScore)+geom_histogram(binwidth=150)+xlab("Total Score")
+p1=ggdensity(data_long_P2$Flight)+geom_histogram(binwidth = 100)+xlab("Flight Score")
+p2=ggdensity(data_long_P2$Bonus)+geom_histogram(binwidth = 100)+xlab("Bonus Score")
+p3=ggdensity(data_long_P2$Mine)+geom_histogram(binwidth = 100)+xlab("Mine Score")
+p4=ggdensity(data_long_P2$Fortress)+geom_histogram(binwidth = 200)+xlab("Fortress Score")
+figure=ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
+figure
+#1.4ZSCORES
+#Zscore and ZMean cor
+p1=ggdensity(data_long_P2$ZFlight)+geom_histogram(binwidth = 0.1)+xlab("Flight ZScore")
+p2=ggdensity(data_long_P2$ZBonus)+geom_histogram(binwidth = 0.1)+xlab("Bonus ZScore")
+p3=ggdensity(data_long_P2$ZMine)+geom_histogram(binwidth = 0.1)+xlab("Mine ZScore")
+p4=ggdensity(data_long_P2$ZFortress)+geom_histogram(binwidth = 0.1)+xlab("Fortress ZScore")
+figure=ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
+figure
+Zcor=ggplot(data_long_P2,aes(ZMean,ZScore))+geom_point()+geom_smooth(method="lm")+theme_pubr()+stat_cor(method="pearson")
+Zcor
+
 #2.LEARNING RATE
 #2.1 D1-D14
 data_long$D=1:11
@@ -55,10 +83,10 @@ eq=paste0("Equation: ZMean= ",round(coef(fit_all_ST)[1],4)," + ",round(coef(fit_
 cor(data_wide$D01P1ZM,data_wide$LearningRate)
 cor(data_wide$D01P1ZM,data_wide$LearningRateST)
 
-ggplot(data_wide,aes(D01P1ZM,LearningRate),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
+ggplot(data_wide,aes(D01P1ZM,LearningRateST),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
   geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZMean")
 
-ggplot(data_wide,aes(D01P1ZM,LearningRateST),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
+ggplot(data_wide,aes(D01P1ZM,LearningRateLT),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
   geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZMean")
 
 #####
@@ -81,8 +109,8 @@ data_wide$Group=factor(data_wide$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
 data_wide%>%
   anova_test(LearningRateST~Group)
 
-LRG_ST=ggplot(data_wide,aes(x=Group,LearningRateST,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova")
-LRG_LT=ggplot(data_wide,aes(x=Group,LearningRateLT,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova")
+LRG_ST=ggplot(data_wide,aes(x=Group,LearningRateST,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
+LRG_LT=ggplot(data_wide,aes(x=Group,LearningRateLT,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
 LRG_ST=set_palette(LRG_ST,"jco")
 LRG_LT=set_palette(LRG_LT,"jco")
 figure=ggarrange(LRG_LT,LRG_ST,ncol=1,nrow=2,labels=c("A","B"))
@@ -91,19 +119,14 @@ figure
 
 tukST=data_wide%>%
   tukey_hsd(LearningRateST~Group)
-ggboxplot(data_wide,x="Group",y="LearningRateST",color="Group")+stat_pvalue_manual(tukST, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.2,1,1.1))+stat_compare_means(method="anova",label.y=0.2) 
+LRG_ST=ggboxplot(data_wide,x="Group",y="LearningRateST",fill="Group")+stat_pvalue_manual(tukST, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.2,1,1.1))+stat_compare_means(method="anova",label.y=0.2)+fill_palette("jco")+rremove("legend")+xlab("")
 
-tuk=data_wide%>%
-  tukey_hsd(LearningRate~Group)
-ggboxplot(data_wide,x="Group",y="LearningRate",color="Group")+stat_pvalue_manual(tuk, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.2,1,1.1))+stat_compare_means(method="anova",label.y=0.2)
-
+tukLT=data_wide%>%
+  tukey_hsd(LearningRateLT~Group)
+LRG_LT=ggboxplot(data_wide,x="Group",y="LearningRateLT",fill="Group")+stat_pvalue_manual(tukLT, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.2,1,1.1))+stat_compare_means(method="anova",label.y=0.2)+fill_palette("jco")+rremove("legend")+xlab("")
+figure=ggarrange(LRG_LT,LRG_ST,ncol=1,nrow=2,labels=c("A","B"))
+figure
 #MANOVA RM
-data_long_P2=subset(data_long,Session=="D01P1"|grepl("P2",Session))
-data_long_P2$Session=substring(data_long_P2$Session,1,3)
-data_long_P2$Treatment=as.factor(data_long_P2$Treatment)
-data_long_P2$Session=as.factor(data_long_P2$Session)
-data_long_P2$Pseudo=as.factor(data_long_P2$Pseudo)
-data_long_P2$GameLevel=as.factor(data_long_P2$GameLevel)
 
 MANOVA.RM::RM(ZMean~GameLevel*Treatment*Session,data=data_long_P2,subject = "Pseudo")
 

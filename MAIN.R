@@ -37,7 +37,6 @@ df_demographique=read.csv(choose.files(default = "", caption = "Select the Demog
 names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
 data_long=demographie_long(data,df_demographique)#LONG FORMAT of the data with dem info
 data_wide=demographie(data,df_demographique,ZMean=FALSE) #WIDE FORMAT of the data with dem info
-#data_wide=demographie(data_long,df_demographique,ZMean=TRUE) #WIDE FORMAT of the data with dem info WITH ZMEAN : to do after Zmean addition with ZScores(data_long)
 
 #OUTLIERS : LM2411 & EC1603 & TB0301
 data_long=subset(data_long,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on long format
@@ -46,6 +45,9 @@ data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#o
 #####
 #ZSCORES
 data_long=ZScores(data_long)
+data_wide=demographie(data_long,df_demographique,ZMean=TRUE) #WIDE FORMAT of the data with dem info WITH ZMEAN : to do after Zmean addition with ZScores(data_long)
+data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on wide format
+
 #####
 #LearningRate
 data_wide=LearningRate(data_long,data_wide)
