@@ -393,24 +393,42 @@ ZScores<-function(dl){
   return(dl)
 }
 
-LearningRate<-function(dl,dw,shortTerm=FALSE){
+LearningRate<-function(dl,dw,shortTerm=FALSE,ZM=TRUE){
   dl$D=1:11
   if(shortTerm==TRUE){
     dl=subset(dl,Session!="D14P2"&Session!="D14P1")
   }
-  fit_all=lm(ZMean~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
-  by_pseudo=dl%>%
-    group_by(Pseudo)
-  lnreg_pseudo=do(by_pseudo,tidy(lm(ZMean~ln(D),data=.)))
-  slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
-  if(shortTerm){
-    for(str_pseudo in unique(dw$Pseudo)){
-      dw$LearningRateST[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+  if(ZM){
+    fit_all=lm(ZMean~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
+    by_pseudo=dl%>%
+      group_by(Pseudo)
+    lnreg_pseudo=do(by_pseudo,tidy(lm(ZMean~ln(D),data=.)))
+    slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
+    if(shortTerm){
+      for(str_pseudo in unique(dw$Pseudo)){
+        dw$LearningRateSTZM[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+      }
+    }else{
+      for(str_pseudo in unique(dw$Pseudo)){
+        dw$LearningRateLTZM[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+      }
     }
   }else{
-    for(str_pseudo in unique(dw$Pseudo)){
-      dw$LearningRateLT[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+    fit_all=lm(ZScore~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
+    by_pseudo=dl%>%
+      group_by(Pseudo)
+    lnreg_pseudo=do(by_pseudo,tidy(lm(ZScore~ln(D),data=.)))
+    slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
+    if(shortTerm){
+      for(str_pseudo in unique(dw$Pseudo)){
+        dw$LearningRateST[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+      }
+    }else{
+      for(str_pseudo in unique(dw$Pseudo)){
+        dw$LearningRateLT[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+      }
     }
   }
+  
   return(dw)
 }

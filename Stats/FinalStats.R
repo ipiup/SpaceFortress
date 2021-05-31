@@ -64,31 +64,36 @@ Zcor
 #2.LEARNING RATE
 #2.1 D1-D14
 data_long$D=1:11
-fit_all=lm(ZMean~ln(D),data=data_long) #fit_all_lin=lm(ZMean~D,data=data_long)
-plot_lnreg_LT=ggplot(data_long,aes(D,ZMean))+geom_point()+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+fit_all=lm(ZScore~ln(D),data=data_long) #fit_all_lin=lm(ZScore~D,data=data_long)
+plot_lnreg_LT=ggplot(data_long,aes(D,ZScore))+geom_point()+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
   stat_smooth(method=lm,formula=y~ln(x))+stat_summary(geom="point",col="red",fun="mean",size=3)+labs(x="Day")+
   scale_x_continuous(breaks=1:11)
-eq=paste0("Equation: ZMean= ",round(coef(fit_all)[1],4)," + ",round(coef(fit_all)[2],4),"*ln(D)")
-
+plot_lnreg_LT
+eq=paste0("Equation: ZScore= ",round(coef(fit_all)[1],4)," + ",round(coef(fit_all)[2],4),"*ln(D)")
+eq
 #2.2D1-D5
 data_long_shortT=subset(data_long,Session!="D14P2"&Session!="D14P1")
-fit_all_ST=lm(ZMean~ln(D),data=data_long_shortT) #fit_all_lin=lm(ZMean~D,data=data_long)
-plot_lnreg_ST=ggplot(data_long_shortT,aes(D,ZMean))+geom_point()+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+fit_all_ST=lm(ZScore~ln(D),data=data_long_shortT) #fit_all_lin=lm(ZScore~D,data=data_long)
+plot_lnreg_ST=ggplot(data_long_shortT,aes(D,ZScore))+geom_point()+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
   stat_smooth(method=lm,formula=y~ln(x))+stat_summary(geom="point",col="red",fun="mean",size=3)+labs(x="Day")+
   scale_x_continuous(breaks=1:9)
-eq=paste0("Equation: ZMean= ",round(coef(fit_all_ST)[1],4)," + ",round(coef(fit_all_ST)[2],4),"*ln(D)")
-
+eq=paste0("Equation: ZScore= ",round(coef(fit_all_ST)[1],4)," + ",round(coef(fit_all_ST)[2],4),"*ln(D)")
+eq
 
 #2.3Correlation
-cor(data_wide$D01P1ZM,data_wide$LearningRate)
+cor(data_wide$D01P1ZM,data_wide$LearningRateLT)
 cor(data_wide$D01P1ZM,data_wide$LearningRateST)
 
-ggplot(data_wide,aes(D01P1ZM,LearningRateST),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
-  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZMean")
+p_reg_ST=ggplot(data_wide,aes(D01P1ZM,LearningRateSTZM),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
+  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZScore")
 
-ggplot(data_wide,aes(D01P1ZM,LearningRateLT),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
-  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZMean")
+p_reg_LT=ggplot(data_wide,aes(D01P1ZM,LearningRateLTZM),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="pearson")+
+  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial ZScore")
 
+reg_ST=ggarrange(plot_lnreg_ST,p_reg_ST,nrow=2,ncol=1,labels = c("A","B"))
+reg_LT=ggarrange(plot_lnreg_LT,p_reg_LT,nrow=2,ncol=1,labels = c("A","B"))
+reg_ST
+reg_LT
 #####
 #3.STATS
 #Effect of GameLevel on each Session Score : correlation btw each day and GameLevel
@@ -106,8 +111,8 @@ figure
 
 #Effect of Stim on learning Rate Anova on three groups
 data_wide$Group=factor(data_wide$Group,levels=c("STIM-SD","STIM-HD","SHAM"))
-data_wide%>%
-  anova_test(LearningRateST~Group)
+xtable(data_wide%>%
+  anova_test(LearningRateLTZM~Group))
 
 LRG_ST=ggplot(data_wide,aes(x=Group,LearningRateST,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
 LRG_LT=ggplot(data_wide,aes(x=Group,LearningRateLT,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
@@ -118,30 +123,54 @@ figure
 
 
 tukST=data_wide%>%
-  tukey_hsd(LearningRateST~Group)
-LRG_ST=ggboxplot(data_wide,x="Group",y="LearningRateST",fill="Group")+stat_pvalue_manual(tukST, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.2,1,1.1))+stat_compare_means(method="anova",label.y=0.2)+fill_palette("jco")+rremove("legend")+xlab("")
+  tukey_hsd(LearningRateSTZM~Group)
+LRG_ST=ggboxplot(data_wide,x="Group",y="LearningRateST",fill="Group")+stat_pvalue_manual(tukST, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.6,1.4,1.5))+stat_compare_means(method="anova",label.y=0.2)+fill_palette("jco")+rremove("legend")+xlab("")
 
 tukLT=data_wide%>%
   tukey_hsd(LearningRateLT~Group)
-LRG_LT=ggboxplot(data_wide,x="Group",y="LearningRateLT",fill="Group")+stat_pvalue_manual(tukLT, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.2,1,1.1))+stat_compare_means(method="anova",label.y=0.2)+fill_palette("jco")+rremove("legend")+xlab("")
+LRG_LT=ggboxplot(data_wide,x="Group",y="LearningRateLT",fill="Group")+stat_pvalue_manual(tukLT, label = "p.adj.signif", tip.length = 0.01,y.position = c(1.6,1.4,1.5))+stat_compare_means(method="anova",label.y=0.2)+fill_palette("jco")+rremove("legend")+xlab("")
 figure=ggarrange(LRG_LT,LRG_ST,ncol=1,nrow=2,labels=c("A","B"))
 figure
+
+data_wide$GameLevel=as.factor(data_wide$GameLevel)
+xtable(data_wide%>%anova_test(LearningRateST~GameLevel+Group))
+
 #MANOVA RM
+data_long_P2$ZScore=as.numeric(data_long_P2$ZScore)
+data_long_P2_noD14=subset(data_long_P2,Session!="D14")
+data_long_P2_noD14$Session=as.factor(data_long_P2_noD14$Session)
+data_long_P2_noD14$Treatment=as.factor(data_long_P2_noD14$Treatment)
+data_long_P2_noD14$Pseudo=as.factor(data_long_P2_noD14$Pseudo)
+data_long_P2_noD14$ZScore=as.numeric(data_long_P2_noD14$ZScore)
 
-MANOVA.RM::RM(ZMean~GameLevel*Treatment*Session,data=data_long_P2,subject = "Pseudo")
+plot_=ggplot(data_long_P2_noD14,aes(Session, TotalScore,fill=as.factor(Treatment)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
+set_palette(plot_,"jco")
 
-#ANOVA with Genre as covariable
+Mano=MANOVA.RM::RM(ZScore~Treatment*Session,data=data_long_P2_noD14,subject = "Pseudo")
+
+xtable(data_long_P2_noD14%>%tukey_hsd(ZScore~Treatment*Session))
+
+#Effet on Long term (D5-D14)
 data_long_LT=subset(data_long,Session=="D05P2"|Session=="D14P2")
+data_long_LT_P2=subset(data_long_P2,Session=="D05"|Session=="D14")
+data_long_LT_P2$Treatment=as.factor(data_long_LT_P2$Treatment)
+data_long_LT_P2$Session=as.factor(data_long_LT_P2$Session)
+
+plot_=ggplot(data_long_LT_P2,aes(Session, TotalScore,fill=as.factor(Treatment)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
+set_palette(plot_,"jco")
+
+xtable(data_long_LT_P2%>%anova_test(ZScore~Treatment*Session))
+(data_long_LT_P2%>%tukey_hsd(ZScore~Treatment*Session))
+
+
+#ANOVA with Genre/GameLevel as covariable
 data_long_LT$Session=as.factor(data_long_LT$Session)
 data_long_LT$Genre=as.factor(data_long_LT$Genre)
 data_long_LT$Treatment=as.factor(data_long_LT$Treatment)
 data_long_LT$GameLevel=as.factor(data_long_LT$GameLevel)
 
-data_long_LT%>%anova_test(ZMean~Treatment*Session+Genre)
-data_long_LT%>%tukey_hsd(ZMean~Treatment*Session+Genre)
+xtable(data_long_LT_P2%>%anova_test(ZScore~Treatment*Session+GameLevel))
+xtable(data_long_LT_P2%>%tukey_hsd(ZScore~Treatment*Session+GameLevel))
 
-summary(manova)
-
-#ANCOVA
-ancova=data_wide%>%anova_test(LearningRateST~GameLevel+Group)
-get_anova_table(ancova)
+n=c("Date","Session","Pseudo","Treatment","Group","TotalScore","Flight","Bonus","Mine","Fortress","NET","GameLevel","Age","Genre","ZScore","ZMean")
+write.csv(subset(data_long,select=n),"E:\\ISAE-2021\\STATS\\DATA_LONG_tRNS.csv")

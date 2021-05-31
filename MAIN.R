@@ -50,5 +50,7 @@ data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#o
 
 #####
 #LearningRate
-data_wide=LearningRate(data_long,data_wide)
-data_wide=LearningRate(data_long,data_wide,TRUE)
+data_wide=LearningRate(data_long,data_wide,ZM=FALSE)
+data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
+data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
+data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
