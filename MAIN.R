@@ -12,28 +12,32 @@ library("dplyr")
 library("broom")
 
 #####
-#DATA CLEANING
-path=choose.dir(default = "", caption = "Choose the participants logs Folder")#Path with the Raw files
-fil=list.files(path=path,recursive = T) # files pattern : "^SpaceFortress-5.1.0(.*).txt$")
-path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
-#Clean File with points writing
-invisible(lapply(fil,write_file,path=path,path_clean=path_clean)) #launch the cleaning
-
-###BEGIN HERE IF DATA ALREADY CLEANED
-if(path_clean==""){#if path_clean was not asked yet 
+b_Clean=winDialog(type="yesno","Are the raw files already cleaned?")
+if(b_Clean=="NO"){
+  #DATA CLEANING
+  path=choose.dir(default = "", caption = "Choose the participants logs Folder")#Path with the Raw files
+  fil=list.files(path=path,recursive = T) # files pattern : "^SpaceFortress-5.1.0(.*).txt$")
   path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
+  #Clean File with points writing
+  invisible(lapply(fil,write_file,path=path,path_clean=path_clean)) #launch the cleaning
+}else{
+  path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
+  
 }
 #CLEAN DATA READING
 fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
 data=read_final_Score(fil_clean) #Create the data 
-df_GROUPS=read.table(choose.files(default = "", caption = "Select the GROUP.txt file"),header=TRUE)#Choose the Group txt file
+#df_GROUPS=read.table(choose.files(default = "", caption = "Select the GROUP.txt file"),header=TRUE)#Choose the Group txt file
+df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
 for(str_pseudo in unique(data$Pseudo)){
   data$Treatment[data$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
 }
 data$Pseudo[data$Pseudo=="SL2804"]="SL0804"
 
 #Add Demographic information
-df_demographique=read.csv(choose.files(default = "", caption = "Select the Demographic.csv file"),head=TRUE,dec = ",",sep=";")
+#df_demographique=read.csv(choose.files(default = "", caption = "Select the Demographic.csv file"),head=TRUE,dec = ",",sep=";")
+df_demographique=read.csv("E:\\ISAE-2021\\2021_05_19_RawData_tRNS_study.csv",head=TRUE,dec = ",",sep=";")
+
 names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
 data_long=demographie_long(data,df_demographique)#LONG FORMAT of the data with dem info
 data_wide=demographie(data,df_demographique,ZMean=FALSE) #WIDE FORMAT of the data with dem info
@@ -54,3 +58,4 @@ data_wide=LearningRate(data_long,data_wide,ZM=FALSE)
 data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
 data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
 data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
+
