@@ -82,13 +82,13 @@ figure
 #2.1 D1-D14
 data_long$D=1:11
 fit_all=lm(TotalScore~ln(D),data=data_long) #fit_all_lin=lm(TotalScore~D,data=data_long)
-eq=paste0("Equation: TotalScore= ",round(coef(fit_all)[1],4)," + ",round(coef(fit_all)[2],4),"*ln(D)")
-
+eqLT=paste0("Equation: TotalScore= ",round(coef(fit_all)[1],4)," + ",round(coef(fit_all)[2],4),"*ln(D)")
+eqLT
 #2.2D1-D5
 data_long_shortT=subset(data_long,Session!="D14P2"&Session!="D14P1")
 fit_all_ST=lm(TotalScore~ln(D),data=data_long_shortT) #fit_all_lin=lm(TotalScore~D,data=data_long)
-eq=paste0("Equation: TotalScore= ",round(coef(fit_all_ST)[1],4)," + ",round(coef(fit_all_ST)[2],4),"*ln(D)")
-
+eqST=paste0("Equation: TotalScore= ",round(coef(fit_all_ST)[1],4)," + ",round(coef(fit_all_ST)[2],4),"*ln(D)")
+eqST
 # #2.3Correlation
 # cor(data_wide$D01P1ZM,data_wide$LearningRateLT)
 # cor(data_wide$D01P1ZM,data_wide$LearningRateST)
@@ -103,10 +103,10 @@ plot_lnreg_ST=ggplot(data_long_shortT,aes(D,TotalScore))+geom_point()+theme_clas
   scale_x_continuous(breaks=1:9)
 
 p_reg_ST=ggplot(data_wide,aes(D01P1,LearningRateST),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+
-  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial Score")+scale_x_continuous(breaks=seq(-3.5,3,0.5))#+scale_x_continuous(breaks=seq(-3.5,0,0.5))
+  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial Score")#+scale_x_continuous(breaks=seq(-3.5,3,0.5))#+scale_x_continuous(breaks=seq(-3.5,0,0.5))
 
 p_reg_LT=ggplot(data_wide,aes(D01P1,LearningRateLT),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+
-  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial Score")+scale_x_continuous(breaks=seq(-3.5,3,0.5))
+  geom_smooth(method='lm',formula=y~x, se = FALSE)+labs(title="Correlation between Learning Rate & Initial Score")#+scale_x_continuous(breaks=seq(-3.5,3,0.5))
 
 reg_ST=ggarrange(plot_lnreg_ST,p_reg_ST,nrow=2,ncol=1,labels = c("A","B"))
 reg_LT=ggarrange(plot_lnreg_LT,p_reg_LT,nrow=2,ncol=1,labels = c("A","B"))
@@ -119,10 +119,10 @@ cor(data_wide$D01P1,data_wide$LearningRateLT,method="pearson")
 #####
 #3.STATS
 #Effect of GameLevel on each Session Score : correlation btw each day and GameLevel
-GameD01=ggplot(data_wide,aes(GameLevel,D01P1),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)
-GameD05=ggplot(data_wide,aes(GameLevel,D05P2),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)
-GameD14=ggplot(data_wide,aes(GameLevel,D14P2),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)
-figure=ggarrange(GameD01,GameD05,GameD14,ncol=1,nrow=3,labels = c("D01","D05","D14"),label.x=0.05)
+GameD01=ggplot(data_wide,aes(GameLevel,D01P1),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)+scale_x_continuous(breaks=seq(-3.5,10,0.5))
+GameD05=ggplot(data_wide,aes(GameLevel,D05P2),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)+scale_x_continuous(breaks=seq(-3.5,10,0.5))
+GameD14=ggplot(data_wide,aes(GameLevel,D14P2),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)+scale_x_continuous(breaks=seq(-3.5,10,0.5))
+figure=ggarrange(GameD01,GameD05,GameD14,ncol=1,nrow=3,labels = c("D01","D05","D14"),label.x=0.1)
 figure
 
 #Effect of GameLevel on the learning Rate
@@ -130,11 +130,13 @@ GameLRST=ggplot(data_wide,aes(GameLevel,LearningRateST),add="reg.line")+geom_poi
 GameLRLT=ggplot(data_wide,aes(GameLevel,LearningRateLT),add="reg.line")+geom_point()+theme_classic2()+stat_cor(method="spearman")+geom_smooth(method='lm',formula=y~x, se = FALSE)
 figure=ggarrange(GameLRLT,GameLRST,ncol=1,nrow=2,labels=c("A","B"))
 figure
-
+xtable(data_wide%>%
+         anova_test(LearningRateLT~Group+GameLevel))
 
 #Effect of Stim on learning Rate Anova on three groups
-data_wide%>%
-  anova_test(LearningRateLT~Group)
+xtable(data_wide%>%
+  anova_test(LearningRateST~Group))
+
 
 LRG_ST=ggplot(data_wide,aes(x=Group,LearningRateST,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
 LRG_LT=ggplot(data_wide,aes(x=Group,LearningRateLT,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
@@ -157,17 +159,20 @@ figure=ggarrange(LRG_LT,LRG_ST,ncol=1,nrow=2,labels=c("A","B"))
 figure
 
 #MANOVA RM
-plot_=ggplot(data_long_P2_noD14,aes(Session, TotalScore,fill=Group))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
+plot_=ggplot(data_long_P2,aes(Session, TotalScore,fill=Group))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
 set_palette(plot_,"jco")
-Mano=MANOVA.RM::RM(TotalScore~Group*Session,data=data_long_P2_noD14,subject = "Pseudo")
-data_long_P2_noD14%>%tukey_hsd(TotalScore~Group*Session)
+Mano=MANOVA.RM::RM(TotalScore~Group*Session,data=data_long_P2,subject = "Pseudo")
+
+xtable(data_long_P2_noD14%>%
+         anova_test(TotalScore~Group*Session))
+
+xtable(data_long_P2_noD14%>%tukey_hsd(TotalScore~Group*Session))
 
 #Effet on Long term (D5-D14)
 anova=datal_long_P2_D5D14%>%anova_test(TotalScore~Group*Session)
 tuk=datal_long_P2_D5D14%>%tukey_hsd(TotalScore~Group*Session)
 #D5_D14=ggboxplot(datal_long_P2_D5D14,x="Session", y="TotalScore",fill="Group",facet.by = "Group")+scale_fill_jco()+theme_pubr()+stat_compare_means(comparisons = list(c("D05","D14")),label="p.signif")#+stat_compare_means(method="anova",label.y=0.2)
-#ggboxplot(datal_long_P2_D5D14,x="Session",y="TotalScore",fill="Group",ggtheme = theme_classic2())+facet_wrap(~Group)+scale_fill_jco()+stat_pvalue_manual(tuk,label = "p.adj.signif", tip.length = 0.01,y.position = c(7000,7800,7400))
-
+ggboxplot(datal_long_P2_D5D14,x="Session",y="TotalScore",fill="Group",ggtheme = theme_classic2())+scale_fill_jco()
 
 #ANOVA with Genre/GameLevel as covariable on D5 D14
 datal_long_P2_D5D14%>%anova_test(TotalScore~Group*Session+GameLevel)
@@ -176,9 +181,11 @@ datal_long_P2_D5D14%>%tukey_hsd(TotalScore~Group*Session+GameLevel)
 datal_long_P2_D5D14%>%anova_test(TotalScore~Group*Session+Genre)
 datal_long_P2_D5D14%>%tukey_hsd(TotalScore~Group*Session+Genre)
 
-#ANOVA with Genre/GameLevel as covariable on D1 D5
-data_long_P2_noD14%>%anova_test(TotalScore~Group*Session+GameLevel)
-data_long_P2_noD14%>%tukey_hsd(TotalScore~Group*Session+GameLevel)
+#ANOVA with Genre/GameLevel as covariable on D1 D14
+xtable(data_long_P2%>%anova_test(TotalScore~Group*Session+GameLevel))
+#data_long_P2%>%tukey_hsd(TotalScore~Group*Session+GameLevel)
+data_long_P2%>%
+  emmeans_test(TotalScore~Group,covariate = GameLevel,p.adjust.method = "holm")
 
 data_long_P2_noD14%>%anova_test(TotalScore~Group*Session+Genre)
 data_long_P2_noD14%>%tukey_hsd(TotalScore~Group*Session+Genre)
