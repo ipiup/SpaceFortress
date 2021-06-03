@@ -21,12 +21,13 @@ if(b_Clean=="NO"){
   #Clean File with points writing
   invisible(lapply(fil,write_file,path=path,path_clean=path_clean)) #launch the cleaning
 }else{
-  path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
+  # path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
+  path_clean="E:\\ISAE-2021\\Alldata\\Data_clean\\"
   
 }
 #CLEAN DATA READING
 fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
-data=read_final_Score(fil_clean) #Create the data 
+data=read_final_Score(fil_clean,detailed = FALSE) #Create the data 
 #df_GROUPS=read.table(choose.files(default = "", caption = "Select the GROUP.txt file"),header=TRUE)#Choose the Group txt file
 df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
 for(str_pseudo in unique(data$Pseudo)){
@@ -48,14 +49,17 @@ data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#o
 
 #####
 #ZSCORES
-data_long=ZScores(data_long)
-data_wide=demographie(data_long,df_demographique,ZMean=TRUE) #WIDE FORMAT of the data with dem info WITH ZMEAN : to do after Zmean addition with ZScores(data_long)
-data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on wide format
+#data_long=ZScores(data_long)
+#data_wide=demographie(data_long,df_demographique,ZMean=TRUE) #WIDE FORMAT of the data with dem info WITH ZMEAN : to do after Zmean addition with ZScores(data_long)
+#data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on wide format
 
+#Women "Outliers" in sham group
+data_wide=subset(data_wide,Pseudo!="CP1809"&Pseudo!="MM0301"&Pseudo!="SP0801"&Pseudo!="CH0205") 
+data_long=subset(data_long,Pseudo!="CP1809"&Pseudo!="MM0301"&Pseudo!="SP0801"&Pseudo!="CH0205")
 #####
 #LearningRate
 data_wide=LearningRate(data_long,data_wide,ZM=FALSE)
 data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
-data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
-data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
+#data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
+#data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
 

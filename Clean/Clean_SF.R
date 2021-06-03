@@ -318,14 +318,22 @@ read_data_score<-function(files_data,add_press=FALSE){
   return(df_data)
 }
 
-read_final_Score<-function(files_data){
-  df_data=foreach(i=1:length(files_data),.combine = rbind)%do%{
-    file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
-    prct_bonus=(sum(file$Type=="ShotsBonusCapture"|file$Type=="PointsBonusCapture")*100)/sum(file$Type=="NewBonus")
-    prct_mine=(sum(file$Type=="FriendMineDestruction"|file$Type=="FoeMineDestruction")*100)/sum(file$Type=="NewMine")
-    data.frame(file$Date[1],file$Session[1],file$Pseudo[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),sum(file$Type=="NewBonus"),sum(file$Type=="NewMine"),prct_bonus,prct_mine,sum(file$Type=="FortressShot"))
+read_final_Score<-function(files_data,detailed=FALSE){
+  if(detailed){
+    df_data=foreach(i=1:length(files_data),.combine = rbind)%do%{
+      file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
+      prct_bonus=(sum(file$Type=="ShotsBonusCapture"|file$Type=="PointsBonusCapture")*100)/sum(file$Type=="NewBonus")
+      prct_mine=(sum(file$Type=="FriendMineDestruction"|file$Type=="FoeMineDestruction")*100)/sum(file$Type=="NewMine")
+      data.frame(file$Date[1],file$Session[1],file$Pseudo[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]),sum(file$Type=="NewBonus"),sum(file$Type=="NewMine"),prct_bonus,prct_mine,sum(file$Type=="FortressShot"))
+      }
+    colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress","NumberofBonus","NumberofMine","Bonus_Prct","Mine_Prct","FortressShot")
+  }else{
+    df_data=foreach(i=1:length(files_data),.combine = rbind)%do%{
+      file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
+      data.frame(file$Date[1],file$Session[1],file$Pseudo[1],sum(file$Point),sum(file$Point[file$Group=="Flight"]),sum(file$Point[file$Group=="Bonus"]),sum(file$Point[file$Group=="Mine"]),sum(file$Point[file$Group=="Fortress"]))
     }
-  colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress","NumberofBonus","NumberofMine","Bonus_Prct","Mine_Prct","FortressShot")
+    colnames(df_data)=c("Date","Session","Pseudo","TotalScore","Flight","Bonus","Mine","Fortress")
+}
   return(df_data)
 }
 
@@ -414,10 +422,10 @@ LearningRate<-function(dl,dw,shortTerm=FALSE,ZM=TRUE){
       }
     }
   }else{
-    fit_all=lm(ZScore~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
+    fit_all=lm(TotalScore~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
     by_pseudo=dl%>%
       group_by(Pseudo)
-    lnreg_pseudo=do(by_pseudo,tidy(lm(ZScore~ln(D),data=.)))
+    lnreg_pseudo=do(by_pseudo,tidy(lm(TotalScore~ln(D),data=.)))
     slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
     if(shortTerm){
       for(str_pseudo in unique(dw$Pseudo)){
