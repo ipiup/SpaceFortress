@@ -41,7 +41,7 @@ df_demographique=read.csv("E:\\demographicsbrut.csv",head=TRUE,dec = ",",sep=";"
 
 names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
 data_long=demographie_long(data,df_demographique)#LONG FORMAT of the data with dem info
-data_wide=demographie(data,df_demographique,ZMean=FALSE) #WIDE FORMAT of the data with dem info
+data_wide=demographie(data,df_demographique,ZMean=FALSE,Delta=TRUE) #WIDE FORMAT of the data with dem info
 
 #OUTLIERS : LM2411 & EC1603 & TB0301
 data_long=subset(data_long,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on long format
@@ -62,4 +62,3 @@ data_wide=LearningRate(data_long,data_wide,ZM=FALSE)
 data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
 #data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
 #data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
-

@@ -9,9 +9,12 @@ library(MANOVA.RM)
 library(viridis)
 library(hrbrthemes)
 library(emmeans)
+library(gghalves)
+library(Hmisc)
+library(ggprism)
 #####
 data_wide$BlindGroup=as.factor(data_wide$BlindGroup)
-data_wide$Group=factor(data_wide$Group,levels=c("STIMSD","STIMHD","SHAM"))
+data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
 data_wide$Genre=as.factor(data_wide$Genre)
 
 data_long$Treatment=factor(data_long$Treatment)
@@ -134,8 +137,8 @@ xtable(data_wide%>%
          anova_test(LearningRateLT~Group+GameLevel))
 
 #Effect of Stim on learning Rate Anova on three groups
-xtable(data_wide%>%
-  anova_test(LearningRateST~Group))
+data_wide%>%
+  anova_test(LearningRateLT~Group+GameLevel)
 
 
 LRG_ST=ggplot(data_wide,aes(x=Group,LearningRateST,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+rremove("legend")+xlab("Groups")+stat_compare_means(method="anova",label.y=0.9)
@@ -198,17 +201,20 @@ ggplot(datal_long_P2_D5D14,aes(Session,TotalScore,fill=Group,palette="jco"))+geo
 ##################################
 #DELTA
 #ANOVA
-data_wide$DeltaD1D14=data_wide$D14P2-data_wide$D01P1
-data_wide$DeltaD1D5=data_wide$D05P2-data_wide$D01P1
-data_wide$DeltaD14D5=data_wide$D14P2-data_wide$D05P2
+data_wide$DeltaD1D14b=data_wide$D14P2-data_wide$D01P1
+data_wide$DeltaD1D5b=data_wide$D05P2-data_wide$D01P1
+data_wide$DeltaD14D5b=data_wide$D14P2-data_wide$D05P2
 
 data_wide%>%
-  anova_test(DeltaD1D5~Group)
+  anova_test(DeltaD14D5~Group)
 
 tukdelta=data_wide%>%
   tukey_hsd(DeltaD14D5~Group)
 
-ggboxplot(data_wide,x="Group",y="DeltaD14D5",fill="Group")+theme_classic2()+stat_pvalue_manual(tukdelta, label = "p.adj.signif", tip.length = 0.01,y.position = c(5000,5500,5100))+scale_fill_jco()
+ph_DeltaD14D5=data_wide%>%
+  emmeans_test(DeltaD14D5~Group,p.adjust.method = "holm")
+
+ggboxplot(data_wide,x="Group",y="DeltaD1D14",fill="Group")+theme_classic2()+stat_pvalue_manual(tukdelta, label = "p.adj.signif", tip.length = 0.01,y.position = c(15000,15500,15100))+scale_fill_jco()
 
 #####
 #Correlation btw Game Level and D01P1
@@ -244,4 +250,64 @@ plot_Delta_D14D5=ggboxplot(data_wide,x="Group",y="DeltaD14D5",fill="Group")+them
 figure=ggarrange(plot_DeltaD1D5,plot_Delta_D1D14,plot_Delta_D14D5,nrow=1,ncol=3,labels = c("D1D5","D1D14","D14D5"))
 figure
 
+data_wide%>%
+  tukey_hsd(LearningRateLT~Group)
+data_wide%>%
+  anova_test(LearningRateST~Group)
 
+
+#####SOUS SCORES
+#Densité des Sous Scores par Session
+D_TotalScore=ggdensity(data_long_P2,x="TotalScore",fill="Session",facet.by = "Session",ggtheme =theme_classic2(),add="mean")+geom_histogram(alpha=0.4,binwidth = 950)+scale_fill_jco()+rremove("legend")
+D_Flight=ggdensity(data_long_P2,x="Flight",fill="Session",facet.by = "Session",ggtheme =theme_classic2(),add="mean")+geom_histogram(alpha=0.4,color="black",binwidth = 300)+scale_fill_jco()+rremove("legend")
+D_Bonus=ggdensity(data_long_P2,x="Bonus",fill="Session",facet.by = "Session",ggtheme =theme_classic2(),add="mean")+geom_histogram(alpha=0.4,color="black",binwidth = 300)+scale_fill_jco()+rremove("legend")
+D_Mine=ggdensity(data_long_P2,x="Mine",fill="Session",facet.by = "Session",ggtheme =theme_classic2(),add="mean")+geom_histogram(alpha=0.4,color="black",binwidth = 300)+scale_fill_jco()+rremove("legend")
+D_Fortress=ggdensity(data_long_P2,x="Fortress",fill="Session",facet.by = "Session",ggtheme =theme_classic2(),add="mean")+geom_histogram(alpha=0.4,color="black",binwidth =500)+scale_fill_jco()+rremove("legend")
+
+ggarrange(D_Flight,D_Mine,D_Fortress,D_Bonus,ncol=2,nrow=2)
+
+data_w
+
+#Halves plots
+
+couleurs=c("#868686FF","#0073C2FF","#A73030FF")
+couleurs_alpha=c("#86868666","#0073C266","#A7303099")
+plot_D14D5=ggplot(data_wide,aes(Group,DeltaD14D5,color=Group,fill=Group))+
+  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
+  scale_color_manual(values=couleurs)+
+  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
+  geom_boxplot(width=0.1,outlier.shape=NA,show.legend = FALSE, position = position_nudge(x=+0.2,y=0))+
+  stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1),size=1.3 ,show.legend = FALSE)
+
+plot_D14D5=plot_D14D5+
+  add_pvalue(ph_DeltaD14D5,y.position=c(7500,8500,8000),
+             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 14 - Day 5)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(-4000,8000,2000))
+plot_D14D5  
+
+
+plot_D14D1=ggplot(data_wide,aes(Group,DeltaD1D14,color=Group,fill=Group))+
+  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
+  scale_color_manual(values=couleurs)+
+  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
+  geom_boxplot(width=0.1,outlier.shape=NA,show.legend = FALSE, position = position_nudge(x=+0.2,y=0))+
+  stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1),size=1.3 ,show.legend = FALSE)
+
+plot_D14D1=plot_D14D1+
+  add_pvalue(ph_DeltaD1D14,y.position=c(20000,22000,21000),
+             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 14 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
+plot_D14D1
+
+plot_D5D1=ggplot(data_wide,aes(Group,DeltaD1D5,color=Group,fill=Group))+
+  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
+  scale_color_manual(values=couleurs)+
+  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
+  geom_boxplot(width=0.1,outlier.shape=NA,show.legend = FALSE, position = position_nudge(x=+0.2,y=0))+
+  stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1),size=1.3 ,show.legend = FALSE)
+
+plot_D5D1=plot_D5D1+
+  add_pvalue(ph_DeltaD1D5,y.position=c(20000,22000,21000),
+             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 5 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
+plot_D5D1
+
+
+ggarrange(plot_D5D1,plot_D14D1,plot_D14D5,nrow=1,ncol=3)
