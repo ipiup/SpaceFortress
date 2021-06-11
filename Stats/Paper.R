@@ -152,15 +152,35 @@ plot_LR_GL=plot_LR_GL+add_pvalue(ph_LR_GL,y.position=c(7500,8500,8000),label = "
   theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+
   ylab("Learning Rate LT")+rremove("legend")+
   scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))
-
-  scale_y_continuous( breaks=seq(-4000,8000,2000))
 plot_LR_GL  
 
+#LR BY SUB SCORE
+
+plot_LR_Flight
+data_LRSubScore=subset(data_wide,select=c("Pseudo","Group","LRFlight","LRBonus","LRMine","LRFortress"))
+data_LRSubScore=melt(data_LRSubScore,id.vars=c("Pseudo","Group"))
+colnames(data_LRSubScore)=c("Pseudo","Group","SousScore","LearningRate")
+plot_LR_SubScore=ggplot(data_LRSubScore,aes(LR,SousScore,fill=Group,color=Group,group=Group))+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1) ,position=position_dodge(width=0.5))+
+  scale_x_discrete(labels=c("Flight","Bonus","Mine","Fortress"))+ylab("LearningRate")+xlab("Sous Score")+geom_point(alpha=0.2,position=position_dodge(width=0.5))
+
+plot_LR_SubScore=ggplot(data_LRSubScore,aes(LR,SousScore,fill=Group,color=Group))+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+
+geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_point(position=position_dodge(width=0.5))+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1,position=position_dodge(width=0.5))+
+  stat_summary(fun=mean, geom="point",size=4,position=position_dodge(width=0.5))+ylab("LearningRate")+xlab("Sous Score")
+
+plot_LR_SubScore
 
 #PREPOST
 data_prepost=read.csv("E:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";")
 data_prepost$Group=factor(data_prepost$Group,levels=c("SHAM","STIMSD","STIMHD"))
-
+data_prepost$PrePost=factor(data_prepost$PrePost,levels=c("Pre","Post"))
+data_prepost$Jour=factor(data_prepost$Jour)
+data_prepost$Pseudo=factor(data_prepost$Pseudo)
+data_prepost$somme=data_prepost$somme-12
 data_prepost$PrePost=factor(data_prepost$PrePost)
+data_prepost_wide=subset(data_prepost,select=c("Pseudo","Group","PrePost","Jour","somme"))
+data_prepost_wide=spread(data_prepost_wide,Jour,somme)
 
-ggplot(data_prepost,aes(x=PrePost,y=somme,fill=Group))+geom_bar(stat="identity",position=position_dodge(),width=0.5)+theme_pubr()+scale_fill_manual(values=couleurs_alpha)
+ggplot(data_prepost,aes(x=Group,y=somme,fill=PrePost,color=PrePost))+geom_jitter(position=position_jitterdodge(jitter.width = 0.7))+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+facet_wrap(~Jour)
+

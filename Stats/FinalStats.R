@@ -208,10 +208,14 @@ ggplot(datal_long_P2_D5D14,aes(Session,TotalScore,fill=Group,palette="jco"))+geo
 #ANOVA
 data_wide$DeltaD1D14b=data_wide$D14P2-data_wide$D01P1
 data_wide$DeltaD1D5b=data_wide$D05P2-data_wide$D01P1
-data_wide$DeltaD14D5b=data_wide$D14P2-data_wide$D05P2
+data_wide$DeltaD14D5b=data_wide$D14P1-data_wide$D05P2
 
 data_wide%>%
   anova_test(DeltaD14D5~Group)
+
+data_wide%>%
+  anova_test(DeltaD14D5b~Group)
+
 
 tukdelta=data_wide%>%
   tukey_hsd(DeltaD14D5~Group)
