@@ -478,3 +478,13 @@ LearningRate<-function(dl,dw,shortTerm=FALSE,ZM=TRUE){
   
   return(dw)
 }
+LearningRate_LT_SousScore<-function(dl,dw){
+  fit_all=lm(TotalScore~ln(D),data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
+  by_pseudo=dl%>%
+    group_by(Pseudo)
+  lnreg_pseudo=do(by_pseudo,tidy(lm(TotalScore~ln(D),data=.)))
+  slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
+  for(str_pseudo in unique(dw$Pseudo)){
+    dw$LearningRateLT[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+  }
+}

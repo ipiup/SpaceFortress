@@ -62,3 +62,6 @@ data_wide=LearningRate(data_long,data_wide,ZM=FALSE)
 data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
 #data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
 #data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
+
+#LOG GameLevel
+data_wide$GameLevelLog=log(data_wide$GameLevel+1)

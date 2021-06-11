@@ -100,7 +100,6 @@ q4=ggqqplot(final_df$Bonus)+xlab("Bonus Score")
 figure_YeoJ=ggarrange(p1,q1,p2,q2,p3,q3,p4,q4,ncol=2,nrow=4)
 figure_YeoJ
 
-
 #ZSubScore
 final_df$ZFlight=scale(final_df$Flight_YeoJ)
 final_df$ZMine=scale(final_df$Mine_YeoJ)
@@ -118,4 +117,28 @@ p3=ggdensity(final_df$ZMine)+geom_histogram(binwidth = 0.1)+xlab("Mine Score")
 p4=ggdensity(final_df$ZFortress)+geom_histogram(binwidth=0.1)+xlab("Fortress Score")
 figure_Z=ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
 figure_Z
+
+
+#LN TRANSFORMATION
+data_long$FlightLN=ln(data_long$Flight+abs(min(data_long$Flight))+1)
+data_long$MineLN=ln(data_long$Mine+abs(min(data_long$Mine))+1)
+data_long$FortressLN=ln(data_long$Fortress+1)
+
+p1LN=ggdensity(data_long$FlightLN)+geom_histogram(binwidth=0.1)+xlab("LN Flight Score")
+p2LN=ggdensity(data_long$MineLN)+geom_histogram(binwidth=0.1)+xlab("LN Mine Score")
+p3LN=ggdensity(data_long$FortressLN)+geom_histogram(binwidth=0.05)+xlab("LN Fortress Score")
+
+p1=ggdensity(data_long$Flight)+geom_histogram(binwidth=100)+xlab("Flight Score")
+p2=ggdensity(data_long$Mine)+geom_histogram(binwidth=100)+xlab("Mine Score")
+p3=ggdensity(data_long$Fortress)+geom_histogram(binwidth=100)+xlab("Fortress Score")
+
+figure_LN=ggarrange(p1LN,p1,p2LN,p2,p3LN,p3,ncol=2,nrow=3)
+figure_LN
+
+p1=ggdensity(data_wide$DeltaD1D14Flight)+xlab("Delta Flight D14 - D1")+geom_histogram(binwidth=100)
+p2=ggdensity(data_wide$DeltaD14D5Bonus)+xlab("Delta Bonus D14 - D1")+geom_histogram(binwidth=75)
+p3=ggdensity(data_wide$DeltaD14D5Mine)+xlab("Delta Mine D14 - D1")+geom_histogram(binwidth=75)
+p4=ggdensity(data_wide$DeltaD14D5Fortress)+xlab("Delta Fortress D14 - D1")+geom_histogram(binwidth=200)
+ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
+
 

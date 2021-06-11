@@ -12,9 +12,12 @@ library(emmeans)
 library(gghalves)
 library(Hmisc)
 library(ggprism)
+data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
+data_long$Group=factor(data_long$Group,levels=c("SHAM","STIMSD","STIMHD"))
+data_long_P2$Group=factor(data_long_P2$Group,levels=c("SHAM","STIMSD","STIMHD"))
+
 #####
 data_wide$BlindGroup=as.factor(data_wide$BlindGroup)
-data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
 data_wide$Genre=as.factor(data_wide$Genre)
 
 data_long$Treatment=factor(data_long$Treatment)
@@ -40,8 +43,10 @@ datal_long_P2_D5D14$Session=factor(datal_long_P2_D5D14$Session)
 
 #1.Descriptives STAT
 #1.1 Outliers Detection
-plot_=ggplot(data_long,aes(Session, TotalScore,fill=as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()
-set_palette(plot_,"jco")
+plot_=ggplot(data_long,aes(Session, TotalScore,fill=as.factor(Group),color==as.factor(Group)))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)
+plot_
+
+ggplot(data_long_P2,aes(Session, TotalScore,fill=Group,color==Group))+geom_boxplot(alpha=0.6,position=position_dodge(0.9))+labs(fill = "Group")+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)
 
 outliers=data%>%
   group_by(Session)%>%
@@ -51,12 +56,12 @@ outliers=data%>%
 #1.2 Données démographiques
 
 #####
-bxp_NET=ggboxplot(data_wide,x="Group",y="NET",color="Group",palette="jco",add="jitter")+labs(x="",y="NET",title="NET")+rremove("legend")#+stat_compare_means(method="anova",label.y=19)
-bxp_GameLevel=ggboxplot(data_wide,x="Group",y="GameLevel",color="Group",palette="jco",add="jitter")+labs(x="",y="GameLevel",title="Game Level")+rremove("legend")#+stat_compare_means(method="anova",label.y=9)
-bxp_Age=ggboxplot(data_wide,x="Group",y="Age",color="Group",palette="jco",add="jitter")+labs(x="",y="Age",title="Age")+rremove("legend")#+stat_compare_means(method="anova",label.y=35)
-bxp_ScoreJ1=ggboxplot(data_wide,x="Group",y="D01P1",color="Group",palette="jco",add="jitter")+labs(x="",y="Score D1",title="First Score")+rremove("legend")#+stat_compare_means(method="anova",label.y=5000)
-bxp_ScoreJ6=ggboxplot(data_wide,x="Group",y="D14P2",color="Group",palette="jco",add="jitter")+labs(x="",y="Score D14P2",title="Last Score")+rremove("legend")#+stat_compare_means(method="anova",label.y=20000)
-bxp_Gender=ggplot(data_wide,aes(as.factor(Group),group=as.factor(Genre),fill=as.factor(Genre)))+geom_bar(width=0.25)+theme_classic2()+theme(legend.title = element_blank(),legend.key.size =unit(0.1,"cm"),legend.position =c(0.4,1.1),legend.direction = "horizontal",legend.background = element_rect(fill ="transparent"),)+labs(x="",y=" ",title="Gender")+scale_fill_jco()
+bxp_NET=ggboxplot(data_wide,x="Group",y="NET",color="Group",fill="Group",add="jitter")+labs(x="",y="NET",title="NET")+rremove("legend")+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+theme_pubr()#+stat_compare_means(method="anova",label.y=19)
+bxp_GameLevel=ggboxplot(data_wide,x="Group",y="GameLevel",color="Group",fill="Group",add="jitter")+labs(x="",y="GameLevel",title="Game Level")+rremove("legend")+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+theme_pubr()#+stat_compare_means(method="anova",label.y=9)
+bxp_Age=ggboxplot(data_wide,x="Group",y="Age",color="Group",fill="Group",add="jitter")+labs(x="",y="Age",title="Age")+rremove("legend")+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+theme_pubr()#+stat_compare_means(method="anova",label.y=35)
+bxp_ScoreJ1=ggboxplot(data_wide,x="Group",y="D01P1",color="Group",fill="Group",add="jitter")+labs(x="",y="Score D1",title="First Score")+rremove("legend")+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+theme_pubr()#+stat_compare_means(method="anova",label.y=5000)
+bxp_ScoreJ6=ggboxplot(data_wide,x="Group",y="D14P2",color="Group",fill="Group",add="jitter")+labs(x="",y="Score D14P2",title="Last Score")+rremove("legend")+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+theme_pubr()#+stat_compare_means(method="anova",label.y=20000)
+bxp_Gender=ggplot(data_wide,aes(as.factor(Group),group=as.factor(Genre),fill=as.factor(Genre)))+geom_bar(width=0.25)+theme_classic2()+theme(legend.title = element_blank(),legend.key.size =unit(0.1,"cm"),legend.position =c(0.4,1.1),legend.direction = "horizontal",legend.background = element_rect(fill ="transparent"),)+labs(x="",y=" ",title="Gender")+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)
 
 ggarrange(bxp_NET,bxp_GameLevel,bxp_ScoreJ1,bxp_ScoreJ6,ncol=2,nrow=2,align="v")#,bxp_Age,bxp_Gender,
 
@@ -229,11 +234,11 @@ ggplot(data_wide,aes(DeltaD1D5,LearningRateST))+geom_point()+theme_classic2()+st
 data_wide$GameLevel=as.numeric(data_wide$GameLevel) #o k ou
 
 data_wide%>%
-  anova_test(DeltaD1D5~Group+GameLevel)
+  anova_test(DeltaD1D5~Group+GameLevelLog)
 data_wide%>%
-  anova_test(DeltaD1D14~Group+GameLevel)
+  anova_test(DeltaD1D14~Group+GameLevelLog)
 data_wide%>%
-  anova_test(DeltaD14D5~Group+GameLevel)
+  anova_test(DeltaD14D5~Group+GameLevelLog)
 
 #posthoc
 ph_DeltaD1D5=data_wide%>%
@@ -255,7 +260,6 @@ data_wide%>%
 data_wide%>%
   anova_test(LearningRateST~Group)
 
-
 #####SOUS SCORES
 #Densité des Sous Scores par Session
 D_TotalScore=ggdensity(data_long_P2,x="TotalScore",fill="Session",facet.by = "Session",ggtheme =theme_classic2(),add="mean")+geom_histogram(alpha=0.4,binwidth = 950)+scale_fill_jco()+rremove("legend")
@@ -266,48 +270,3 @@ D_Fortress=ggdensity(data_long_P2,x="Fortress",fill="Session",facet.by = "Sessio
 
 ggarrange(D_Flight,D_Mine,D_Fortress,D_Bonus,ncol=2,nrow=2)
 
-data_w
-
-#Halves plots
-
-couleurs=c("#868686FF","#0073C2FF","#A73030FF")
-couleurs_alpha=c("#86868666","#0073C266","#A7303099")
-plot_D14D5=ggplot(data_wide,aes(Group,DeltaD14D5,color=Group,fill=Group))+
-  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
-  scale_color_manual(values=couleurs)+
-  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
-  geom_boxplot(width=0.1,outlier.shape=NA,show.legend = FALSE, position = position_nudge(x=+0.2,y=0))+
-  stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1),size=1.3 ,show.legend = FALSE)
-
-plot_D14D5=plot_D14D5+
-  add_pvalue(ph_DeltaD14D5,y.position=c(7500,8500,8000),
-             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 14 - Day 5)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(-4000,8000,2000))
-plot_D14D5  
-
-
-plot_D14D1=ggplot(data_wide,aes(Group,DeltaD1D14,color=Group,fill=Group))+
-  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
-  scale_color_manual(values=couleurs)+
-  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
-  geom_boxplot(width=0.1,outlier.shape=NA,show.legend = FALSE, position = position_nudge(x=+0.2,y=0))+
-  stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1),size=1.3 ,show.legend = FALSE)
-
-plot_D14D1=plot_D14D1+
-  add_pvalue(ph_DeltaD1D14,y.position=c(20000,22000,21000),
-             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 14 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
-plot_D14D1
-
-plot_D5D1=ggplot(data_wide,aes(Group,DeltaD1D5,color=Group,fill=Group))+
-  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
-  scale_color_manual(values=couleurs)+
-  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
-  geom_boxplot(width=0.1,outlier.shape=NA,show.legend = FALSE, position = position_nudge(x=+0.2,y=0))+
-  stat_summary(fun.data = "mean_sdl", fun.args = list(mult = 1),size=1.3 ,show.legend = FALSE)
-
-plot_D5D1=plot_D5D1+
-  add_pvalue(ph_DeltaD1D5,y.position=c(20000,22000,21000),
-             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 5 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
-plot_D5D1
-
-
-ggarrange(plot_D5D1,plot_D14D1,plot_D14D5,nrow=1,ncol=3)
