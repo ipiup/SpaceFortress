@@ -67,3 +67,4 @@ data_wide=LearningRate_LT_SousScore(data_long,data_wide)
 
 #LOG GameLevel
 data_wide$GameLevelLog=log(data_wide$GameLevel+1)
+
