@@ -274,3 +274,7 @@ D_Fortress=ggdensity(data_long_P2,x="Fortress",fill="Session",facet.by = "Sessio
 
 ggarrange(D_Flight,D_Mine,D_Fortress,D_Bonus,ncol=2,nrow=2)
 
+
+#Hedges g 
+library(esvis)
+hedg_g(data_wide,DeltaD1D14~Group)

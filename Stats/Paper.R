@@ -69,6 +69,10 @@ ph_DeltaD1D14=data_wide%>%
   emmeans_test(DeltaD1D14~Group,covariate = GameLevelLog,p.adjust.method = "holm")
 ph_DeltaD14D5=data_wide%>%
   emmeans_test(DeltaD14D5~Group,covariate = GameLevelLog,p.adjust.method = "holm")
+ph_DeltaD14D5$p.adj.signif[ph_DeltaD14D5$p.adj.signif=="ns"]=""
+ph_DeltaD1D14$p.adj.signif[ph_DeltaD1D14$p.adj.signif=="ns"]=""
+ph_DeltaD1D5$p.adj.signif[ph_DeltaD1D5$p.adj.signif=="ns"]=""
+
 ##
 
 plot_D14D5=ggplot(data_wide,aes(Group,DeltaD14D5,color=Group,fill=Group))+
@@ -81,7 +85,10 @@ plot_D14D5=ggplot(data_wide,aes(Group,DeltaD14D5,color=Group,fill=Group))+
 
 plot_D14D5=plot_D14D5+
   add_pvalue(ph_DeltaD14D5,y.position=c(7500,8500,8000),
-             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 14 - Day 5)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(-4000,8000,2000))
+             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+
+  theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+
+  ylab("Delta Performance (Day 14 - Day 5)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+
+  scale_y_continuous( breaks=seq(-4000,8000,2000))
 plot_D14D5  
 
 
@@ -95,7 +102,9 @@ plot_D14D1=ggplot(data_wide,aes(Group,DeltaD1D14,color=Group,fill=Group))+
 
 plot_D14D1=plot_D14D1+
   add_pvalue(ph_DeltaD1D14,y.position=c(20000,22000,21000),
-             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 14 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
+             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+
+  theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+
+  ylab("Delta Performance (Day 14 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
 plot_D14D1
 
 plot_D5D1=ggplot(data_wide,aes(Group,DeltaD1D5,color=Group,fill=Group))+
@@ -108,7 +117,9 @@ plot_D5D1=ggplot(data_wide,aes(Group,DeltaD1D5,color=Group,fill=Group))+
 
 plot_D5D1=plot_D5D1+
   add_pvalue(ph_DeltaD1D5,y.position=c(20000,22000,21000),
-             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+ylab("Performance Retention (Day 5 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
+             label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,fontface="bold")+
+  theme(axis.title=element_text(size=12,face="bold"),axis.text =element_text(size=12) )+
+  ylab("Delta Performance (Day 5 - Day 1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+scale_y_continuous( breaks=seq(0,20000,2000))
 plot_D5D1
 
 #####
@@ -216,10 +227,31 @@ fit_all_ln=lm(TotalScore~ln(D),data=data_long)
 fit_all_lin=lm(TotalScore~D,data=data_long)
 AIC(fit_all_ln)
 AIC(fit_all_lin)
-plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,group=Group))+geom_point(position=position_dodge(width=0.5),alpha=0.3)+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+plot_LR=ggplot(data_long,aes(D,Flight,color=Group,group=Group))+geom_point(position=position_dodge(width=0.5),alpha=0.3)+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
   stat_smooth(method=lm,formula=y~ln(x),se=FALSE)+stat_summary(geom="point",fun="mean",size=3)+labs(x="Sessions")+
   scale_x_continuous(breaks=1:11)+scale_color_manual(values=couleurs)
 plot_LR
+
+p1=ggplot(data_long,aes(D,Flight,color=Group,group=Group))+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+  stat_smooth(method=lm,formula=y~poly(x,2),se=FALSE)+stat_summary(geom="point",fun="mean",size=3)+labs(x="Sessions")+
+  scale_x_continuous(breaks=1:11)+scale_color_manual(values=couleurs)
+
+p2=ggplot(data_long,aes(D,Bonus,color=Group,group=Group))+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+  stat_smooth(method=lm,formula=y~ln(x),se=FALSE)+stat_summary(geom="point",fun="mean",size=3)+labs(x="Sessions")+
+  scale_x_continuous(breaks=1:11)+scale_color_manual(values=couleurs)
+p3=ggplot(data_long,aes(D,Mine,color=Group,group=Group))+theme_classic2()+annotate("text",label=paste("Equation :","y~ln(x)"),x=3,y=2)+
+  stat_smooth(method=lm,formula=y~ln(x),se=FALSE)+stat_summary(geom="point",fun="mean",size=3)+labs(x="Sessions")+
+  scale_x_continuous(breaks=1:11)+scale_color_manual(values=couleurs)
+p4=ggplot(data_long,aes(D,Fortress,color=Group,group=Group))+theme_classic2()+annotate("text",label=paste("Equation :","y~x"),x=3,y=2)+
+  stat_smooth(method=lm,formula=y~x,se=FALSE)+stat_summary(geom="point",fun="mean",size=3)+labs(x="Sessions")+
+  scale_x_continuous(breaks=1:11)+scale_color_manual(values=couleurs)
+
+ggarrange(p1,p2,p3,p4,ncol=2,nrow=2)
+
+data_wide%>%
+  anova_test(LRFortress~Group)
+data_wide%>%
+  anova_test(LRFortress~Group+GameLevelLog)
 
 #LR BY SUB SCORE
 plot_LR_Flight
@@ -236,8 +268,6 @@ geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_point(po
   stat_summary(fun=mean, geom="point",size=4,position=position_dodge(width=0.5))+ylab("LearningRate")+xlab("Sous Score")
 
 plot_LR_SubScore
-
-
 
 #PREPOST
 data_prepost=read.csv("E:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";")

@@ -476,7 +476,6 @@ LearningRate<-function(dl,dw,shortTerm=FALSE,ZM=TRUE){
       }
     }
   }
-  
   return(dw)
 }
 LearningRate_LT_SousScore<-function(dl,dw){
@@ -503,11 +502,12 @@ LearningRate_LT_SousScore<-function(dl,dw){
     dw$LRMine[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
   }
   #FORTRESS
-  lnreg_pseudo=do(by_pseudo,tidy(lm(Fortress~ln(D),data=.)))
-  slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"]
+  fit_all=lm(Fortress~D,data=dl) #fit_all_lin=lm(ZMean~D,data=dl)
+  lnreg_pseudo=do(by_pseudo,tidy(lm(Fortress~D,data=.)))
+  slope_pseudo=lnreg_pseudo$estimate[lnreg_pseudo$term=="D"]
   for(str_pseudo in unique(dw$Pseudo)){
-    dw$LRFortress[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="ln(D)"&lnreg_pseudo$Pseudo==str_pseudo]
+    dw$LRFortress[dw$Pseudo==str_pseudo]=lnreg_pseudo$estimate[lnreg_pseudo$term=="D"&lnreg_pseudo$Pseudo==str_pseudo]
   }
   return(dw)
-  
 }
+
