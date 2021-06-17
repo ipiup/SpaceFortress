@@ -90,6 +90,9 @@ figure
 #2.1 D1-D14
 data_long$D=1:11
 fit_all=lm(TotalScore~ln(D),data=data_long) #fit_all_lin=lm(TotalScore~D,data=data_long)
+fit_lin=lm(TotalScore~D,data=data_long)
+AIC(fit_all)
+AIC(fit_lin)
 eqLT=paste0("Equation: TotalScore= ",round(coef(fit_all)[1],4)," + ",round(coef(fit_all)[2],4),"*ln(D)")
 eqLT
 #2.2D1-D5
