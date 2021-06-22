@@ -67,3 +67,5 @@ data_wide=LearningRate_LT_SousScore(data_long,data_wide)
 #LOG GameLevel
 data_wide$GameLevelLog=log(data_wide$GameLevel+1)
 
+df_demographique=subset(df_demographique,identifiant!="CP1809"&identifiant!="MM0301"&identifiant!="SP0801"&identifiant!="CH0205") 
+df_demographique=subset(df_demographique,identifiant!="LM2411"&identifiant!="EC1603"&identifiant!="TB0301")

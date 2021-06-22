@@ -1,5 +1,6 @@
 #Paper Plots
 
+library(reshape2)
 
 data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
 
@@ -14,39 +15,41 @@ bxp_NET=ggplot(data_wide,aes(Group,NET,color=Group,fill=Group,shape=Group))+
   geom_half_violin(position = position_nudge(x=-0.2,y=0))+geom_point(alpha=0.3,show.legend = FALSE)+
   stat_summary(fun=mean, geom="point",size=2,show.legend = FALSE)+theme_pubr()+rremove("legend")+
   scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+xlab("")+ylab("Education Level")+
-  theme(axis.title=element_text(size=18),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 bxp_GameLevel=ggplot(data_wide,aes(Group,GameLevel,color=Group,fill=Group,shape=Group))+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.7 ,show.legend = FALSE,geom="errorbar",width=0.2)+
   geom_half_violin(position = position_nudge(x=-0.2,y=0))+geom_point(alpha=0.3,show.legend = FALSE)+
   stat_summary(fun=mean, geom="point",size=2,show.legend = FALSE)+theme_pubr()+rremove("legend")+
   scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+xlab("")+ylab("Game Level")+
-  theme(axis.title=element_text(size=18),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 bxp_Age=ggplot(data_wide,aes(Group,Age,color=Group,fill=Group,shape=Group))+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.7 ,show.legend = FALSE,geom="errorbar",width=0.2)+
   geom_half_violin(position = position_nudge(x=-0.2,y=0))+geom_point(alpha=0.3,show.legend = FALSE)+
   stat_summary(fun=mean, geom="point",size=2,show.legend = FALSE)+theme_pubr()+rremove("legend")+
   scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+xlab("")+
-  theme(axis.title=element_text(size=18),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 bxp_ScoreJ1=ggplot(data_wide,aes(Group,D01P1,color=Group,fill=Group,shape=Group))+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.7 ,show.legend = FALSE,geom="errorbar",width=0.2)+
   geom_half_violin(position = position_nudge(x=-0.2,y=0))+geom_point(alpha=0.3,show.legend = FALSE)+
   stat_summary(fun=mean, geom="point",size=2,show.legend = FALSE)+theme_pubr()+rremove("legend")+
   scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+xlab("")+ylab("First Session")+
-  theme(axis.title=element_text(size=18),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 bxp_ScoreJ6=ggplot(data_wide,aes(Group,D14P2,color=Group,fill=Group,shape=Group))+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.7 ,show.legend = FALSE,geom="errorbar",width=0.2)+
   geom_half_violin(position = position_nudge(x=-0.2,y=0))+geom_point(alpha=0.3,show.legend = FALSE)+
   stat_summary(fun=mean, geom="point",size=2,show.legend = FALSE)+theme_pubr()+rremove("legend")+
   scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+xlab("")+ylab("Last Session")+
-  theme(axis.title=element_text(size=18),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 bxp_Gender=ggplot(data_wide,aes(Group,Gender,color=Group,fill=Group,shape=Group))+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.7 ,show.legend = FALSE,geom="errorbar",width=0.2)+
   geom_half_violin(position = position_nudge(x=-0.2,y=0))+geom_point(alpha=0.3,show.legend = FALSE)+
   stat_summary(fun=mean, geom="point",size=2,show.legend = FALSE)+theme_pubr()+rremove("legend")+
   scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+xlab("")+ylab("Gender")+
-  theme(axis.title=element_text(size=18),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 demo=ggarrange(bxp_NET,bxp_GameLevel,bxp_ScoreJ1,bxp_ScoreJ6,ncol=2,nrow=2,align="v")
 demo
+ggsave(plot=demo,"Paper\\FINAL\\Demographics.pdf",device="pdf",width=10,height=6)
+
 #TotalScore
 ggplot(data_long,aes(Group,TotalScore,color=Group,fill=Group))+
   theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
@@ -200,7 +203,6 @@ plot_D14D5_Mine
 
 
 #DELTA BY GROUP
-library(reshape2)
 data_D14D5_SousScore=subset(data_wide,select=c("Pseudo","Group","GameLevelLog","DeltaD14D5Flight","DeltaD14D5Bonus","DeltaD14D5Mine","DeltaD14D5Fortress"))
 data_long_delta=melt(data_D14D5_SousScore,id.vars=c("Pseudo","Group","GameLevelLog"))
 colnames(data_long_delta)=c("Pseudo","Group","GameLevelLog","Delta","Performance")
@@ -265,10 +267,9 @@ data_wide%>%
   anova_test(LRFortress~Group+GameLevelLog)
 
 #LR BY SUB SCORE
-plot_LR_Flight
 data_LRSubScore=subset(data_wide,select=c("Pseudo","Group","LRFlight","LRBonus","LRMine","LRFortress"))
 data_LRSubScore=melt(data_LRSubScore,id.vars=c("Pseudo","Group"))
-colnames(data_LRSubScore)=c("Pseudo","Group","SousScore","LearningRate")
+colnames(data_LRSubScore)=c("Pseudo","Group","SousScore","LR")
 plot_LR_SubScore=ggplot(data_LRSubScore,aes(LR,SousScore,fill=Group,color=Group,group=Group))+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1) ,position=position_dodge(width=0.5))+
   scale_x_discrete(labels=c("Flight","Bonus","Mine","Fortress"))+ylab("LearningRate")+xlab("Sous Score")+geom_point(alpha=0.2,position=position_dodge(width=0.5))
@@ -300,9 +301,11 @@ ggplot(data_prepost,aes(x=Group,y=somme,color=Group,fill=Group))+geom_boxplot(sh
   stat_summary(fun=mean,show.legend = FALSE, geom="point",size=3,position=position_dodge(width=0.5))+ylab("Subjective evaluation Sum")+labs(shape="Pre-Post")+guides(color=FALSE)+
   theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+facet_wrap(~Jour)
 
-data_prepost_wide$value=as.numeric(data_prepost_wide$value)
-ggplot(data_prepost_wide,aes(variable,value,color=Group,fill=Group))+geom_boxplot(position="dodge")+theme_pubr()+theme(axis.text.x = element_text(angle = 90))+
-  scale_color_manual(values=couleurs)+scale_fill_manual(values=couleurs)
+
+ggplot(filter(data_prepost_wide,variable!="somme"),aes(variable,value,color=Group,fill=Group))+theme_pubr()+
+  geom_jitter(position=position_jitterdodge(jitter.width = 0.3),alpha=0.4)+xlab("")+
+  theme(axis.text.x = element_text(angle = 90,hjust=1),axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )+
+  scale_color_manual(values=couleurs)+scale_fill_manual(values=couleurs)+scale_y_continuous(breaks=c(1,2,3))
 
 ##SOUS SCORE PAR SESSION
 data_long$Day=rep(c(1,2,2,3,3,4,4,5,5,14,14),61)
@@ -330,11 +333,14 @@ plot_Fortress=ggplot(data_long,aes(D,Fortress,color=Group,group=Group))+theme_pu
 ggarrange(plot_Flight,plot_Bonus,plot_Mine,plot_Fortress,ncol=2,nrow=2,common.legend = TRUE)
 
 
-plot_Flight=ggplot(data_long,aes(D,Flight,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
-  stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+scale_color_manual(values=couleurs)+
-  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
+plot_Flight=ggplot(data_long,aes(D,Flight,color=Group,group=Group))+theme_pubr()+
+  geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
+  stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
+  scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
+  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  xlab("Session")+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
+  stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
 plot_Bonus=ggplot(data_long,aes(D,Bonus,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+scale_color_manual(values=couleurs)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
