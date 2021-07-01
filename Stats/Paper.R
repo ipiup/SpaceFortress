@@ -6,6 +6,7 @@ data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
 
 couleurs=c("#868686FF","#0073C2FF","#A73030FF")
 couleurs_alpha=c("#86868666","#0073C266","#A7303099")
+
 data_long$Session=factor(data_long$Session)
 
 
@@ -280,32 +281,6 @@ geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_point(po
   stat_summary(fun=mean, geom="point",size=4,position=position_dodge(width=0.5))+ylab("LearningRate")+xlab("Sous Score")
 
 plot_LR_SubScore
-
-#PREPOST
-data_prepost=read.csv("E:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";")
-data_prepost$Group=factor(data_prepost$Group,levels=c("SHAM","STIMSD","STIMHD"))
-data_prepost$PrePost=factor(data_prepost$PrePost,levels=c("Pre","Post"))
-data_prepost$Jour=factor(data_prepost$Jour,levels=c("Mardi","Mercredi","Jeudi"),labels=c("Sessions 2 & 3","Sessions 4 & 5","Sessions 6 & 7"))
-data_prepost$Pseudo=factor(data_prepost$Pseudo)
-data_prepost$somme=data_prepost$somme-12
-data_prepost$PrePost=factor(data_prepost$PrePost)
-data_prepost_J2=subset(data_prepost,Jour=="Sessions 2 & 3")
-data_prepost_wide=reshape(data_prepost_J2,direction="long",varying=list(names(data_prepost)[5:17]),v.names="Value",idvar=c("Pseudo","Group","PrePost","Jour"),timevar = "Question")
-data_prepost_wide=melt(data_prepost_J2,id.vars=c("Pseudo","PrePost","Jour","Group"))
-
-ggplot(data_prepost,aes(x=Group,y=somme,color=Group,shape=PrePost))+geom_jitter(position=position_jitterdodge(jitter.width = 0.6),alpha=0.4)+
-  stat_summary(fun=mean, geom="point",size=3,position=position_dodge(width=0.5))+ylab("Subjective evaluation Sum")+labs(shape="Pre-Post")+guides(color=FALSE)+
-  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.8 ,show.legend = FALSE,geom="errorbar",width=0.2,position=position_dodge(width=0.5))+theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+facet_wrap(~Jour)
-
-ggplot(data_prepost,aes(x=Group,y=somme,color=Group,fill=Group))+geom_boxplot(show.legend = FALSE)+
-  stat_summary(fun=mean,show.legend = FALSE, geom="point",size=3,position=position_dodge(width=0.5))+ylab("Subjective evaluation Sum")+labs(shape="Pre-Post")+guides(color=FALSE)+
-  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+scale_color_manual(values=couleurs)+facet_wrap(~Jour)
-
-
-ggplot(filter(data_prepost_wide,variable!="somme"),aes(variable,value,color=Group,fill=Group))+theme_pubr()+
-  geom_jitter(position=position_jitterdodge(jitter.width = 0.3),alpha=0.4)+xlab("")+
-  theme(axis.text.x = element_text(angle = 90,hjust=1),axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )+
-  scale_color_manual(values=couleurs)+scale_fill_manual(values=couleurs)+scale_y_continuous(breaks=c(1,2,3))
 
 ##SOUS SCORE PAR SESSION
 data_long$Day=rep(c(1,2,2,3,3,4,4,5,5,14,14),61)

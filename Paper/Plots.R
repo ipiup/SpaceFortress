@@ -3,22 +3,26 @@
 
 couleurs=c("#868686FF","#0073C2FF","#A73030FF")
 couleurs_alpha=c("#86868666","#0073C266","#A7303099")
+data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
+data_long$Group=factor(data_long$Group,levels=c("SHAM","STIMSD","STIMHD"))
 library(grid)
 data_long$D=1:11
 #TotalScore
-ggplot(data_long,aes(D,TotalScore,color=Group,group=Group,shape=Group))+theme_pubr()+
+p_total=ggplot(data_long,aes(D,TotalScore,color=Group,group=Group,shape=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3)+stat_summary(geom="line",fun="mean",show.legend = FALSE)+
-  scale_color_manual(values=couleurs)+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
   geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  xlab("Sessions")+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())
+  xlab("Game Session")+
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+p_total
+ggsave(plot=p_total,"Paper\\FINAL\\TotalScoreperSession.pdf",device="pdf",width=10,height=6)
 
 #Learning Rate by groups
-
-
 fit_SHAM=lm(TotalScore~ln(D),data=filter(data_long,Group=="SHAM"))
 fit_SD=lm(TotalScore~ln(D),data=filter(data_long,Group=="STIMSD"))
 fit_HD=lm(TotalScore~ln(D),data=filter(data_long,Group=="STIMHD"))
@@ -36,29 +40,35 @@ plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.5))+
-  stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE,alpha=0.8,linetype="dashed")+
-  labs(x="Sessions",y="Total Score")+
+  #stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE,alpha=0.8,linetype="dashed")+
+  labs(x="Game Session",y="Total Score")+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))+
-  scale_color_manual(values=couleurs)+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_y_continuous(breaks =seq(0, 15000, by = 2500))+
   annotation_custom(grob_SHAM)+ annotation_custom(grob_SD)+ annotation_custom(grob_HD)+
   theme(legend.position = c(0.69,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
-        axis.title = element_text(size=18,margin=0.1),text=element_text(size=16))
+        axis.title = element_text(size=18,margin=0.1),text=element_text(size=16))+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
 plot_LR
+
+ggsave(plot=plot_LR,"Paper\\FINAL\\RegressionByGroupV2.pdf",device="pdf",width=10,height=6)
+
 
 plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
   stat_summary(geom="point",fun="mean",size=3 )+
-  labs(x="Sessions",y="Total Score")+scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  scale_color_manual(values=couleurs)+
+  labs(x="Session",y="Total Score")+scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   theme(legend.position = c(0.71,0.15),legend.title = element_blank(),axis.title = element_text(size=18),text=element_text(size=16))+
   scale_y_continuous(breaks =seq(0, 15000, by = 2500))+
   annotation_custom(grob_SHAM)+ annotation_custom(grob_SD)+ annotation_custom(grob_HD)+
   theme(legend.position = c(0.7,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
         axis.title = element_text(size=18,margin=0.1),text=element_text(size=16))
-plot_LR
+
 
 #####
 # annotation_df <- data.frame(label = c(eq_SHAM,eq_SD,eq_HD),Group =c("SHAM","STIMSD","STIMHD"),x = c(9, 9, 9),y = c(500, 500, 500))
@@ -98,12 +108,12 @@ p_S11S9=ggplot(data_wide,aes(Group,DeltaD14D5,color=Group,fill=Group,shape=Group
   geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1)+
   stat_summary(fun=mean, geom="point",size=4)+
-  ylab("Delta Performance (S11 - S9)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+
+  ylab("Delta Performance (GS11 - GS9)")+rremove("legend")+scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_y_continuous( breaks=seq(-4000,10000,2000),limits=c(-4000,12000))+
   add_pvalue(ph_S11S9,y.position=c(7500,9500,8500),
              label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,label.size=5)+
-  #annotation_custom(grob_S11S9)+
-  annotate("text",x=1,y=11300,label=text_S11S9,size=6,hjust=0)+
+  annotation_custom(grob_S11S9)+
+  #annotate("text",x=1,y=11300,label=text_S11S9,size=6,hjust=0)+
   theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 p_S11S9  
 
@@ -126,12 +136,12 @@ p_S11S1=ggplot(data_wide,aes(Group,DeltaD1D14,color=Group,fill=Group,shape=Group
   geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1)+
   stat_summary(fun=mean, geom="point",size=4)+
-  ylab("Delta Performance (S11 - S1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+
+  ylab("Delta Performance (GS11 - GS1)")+rremove("legend")+scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_y_continuous( breaks=seq(2000,24000,3000),limits=c(2800,24500))+
-  add_pvalue(ph_S11S1,y.position=c(20000,22000,21000),
+  add_pvalue(ph_S11S1,y.position=c(19000,22000,20500),
              label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE,label.size=5)+
-  #annotation_custom(grob_S11S1)+
-  annotate("text",x=1,y=24300,label=txt_S11S1,size=6,hjust=0)+
+  annotation_custom(grob_S11S1)+
+ #annotate("text",x=1,y=24300,label=txt_S11S1,size=6,hjust=0)+
   theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
 p_S11S1 
 
@@ -152,20 +162,26 @@ p_S9S1=ggplot(data_wide,aes(Group,DeltaD1D5,color=Group,fill=Group,shape=Group))
   geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1)+
   stat_summary(fun=mean, geom="point",size=4)+
-  ylab("Delta Performance (S9 - S1)")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+
+  ylab("Delta Performance (GS9 - GS1)")+rremove("legend")+scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_y_continuous( breaks=seq(1500,18000,2000),limits=c(1000,18500))+
-  #annotation_custom(grob_S9S1)+
-  annotate("text",x=1,y=18300,label=txt_S9S1,size=6,hjust=0)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
+  annotation_custom(grob_S9S1)+
+  #annotate("text",x=1,y=18300,label=txt_S9S1,size=6,hjust=0)+
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16))
 p_S9S1
 
-layout_matrix <- matrix(c(1, 1, 2, 2, 4, 3, 3, 4), nrow = 2, byrow = TRUE)
-grid.arrange(p_S9S1,p_S11S1,p_S11S9, layout_matrix = layout_matrix)
-ggarrange(p_S9S1,p_S11S1,p_S11S9,ncol=2,nrow=2,)
+library(patchwork)
+
+f_delta=( p_S9S1|p_S11S1) /(plot_spacer() + p_S11S9 + plot_spacer() + plot_layout(widths = c(1,2,1)))+
+  plot_annotation(tag_levels = "A")&theme(plot.tag.position = c(0.01,0.95),plot.tag = element_text(size=22,face = 'bold'))
+f_delta
+
+ggsave(plot=f_delta,"Paper\\FINAL\\FigureDelta2.pdf",device="pdf",width=14,height=12)
+
 
 ggsave(plot=p_S11S1,"Paper\\FINAL\\DeltaS11S1.pdf",device="pdf",width=10,height=6)
 ggsave(plot=p_S9S1,"Paper\\FINAL\\DeltaS9S1.pdf",device="pdf",width=10,height=6)
 ggsave(plot=p_S11S9,"Paper\\FINAL\\DeltaS11S9.pdf",device="pdf",width=10,height=6)
+
 
 #ANCOVA LR
 ancova_LR=data_wide%>%
@@ -183,7 +199,7 @@ p_ancovaLR=ggplot(data_wide,aes(Group,LearningRateLT,color=Group,fill=Group,shap
   geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1)+
   stat_summary(fun=mean, geom="point",size=4)+
-  ylab("Learning Rate")+rremove("legend")+scale_x_discrete(labels=c("SHAM","STIM-SD","STIM-HD"))+
+  ylab("Learning Rate")+rremove("legend")+scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_y_continuous( breaks=seq(-4000,8000,1000))+
   # add_pvalue(ph_LR,y.position=c(7500,8700,8100),
              # label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE)+
@@ -191,50 +207,63 @@ p_ancovaLR=ggplot(data_wide,aes(Group,LearningRateLT,color=Group,fill=Group,shap
   theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16) )
 p_ancovaLR  
 
-ggsave(plot=p_ancovaLR,"Paper\\FINAL\\LearningRateAncova.pdf",device="pdf",width=10,height=6)
+ggsave(plot=p_ancovaLR,"Paper\\FINAL\\LearningRateAncova_small.pdf",device="pdf",width=7,height=6)
 
 
 #Sous Score by session
-
 plot_Flight=ggplot(data_long,aes(D,Flight,color=Group,group=Group,shape=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
   stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
-  scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
-  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
+  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Game Session")+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
   stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3),show.legend = FALSE)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
 
 plot_Bonus=ggplot(data_long,aes(D,Bonus,color=Group,group=Group,shape=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
   stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
-  scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
-  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))
+  +geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
+  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Game Session")+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
   stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3),show.legend = FALSE)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
 
 plot_Mine=ggplot(data_long,aes(D,Mine,color=Group,group=Group,shape=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
   stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
-  scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
-  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
+  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Game Session")+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
   stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3),show.legend = FALSE)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+plot_Mine
 
 plot_Fortress=ggplot(data_long,aes(D,Fortress,color=Group,group=Group,shape=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
   stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
-  scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
-  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
+  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Game Session")+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
   stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3),show.legend = FALSE)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+plot_Fortress
 
 ggarrange(plot_Flight,plot_Bonus,plot_Mine,plot_Fortress,ncol=2,nrow=2,common.legend = TRUE)
 ggsave(plot=plot_Flight,"Paper\\FINAL\\FlightScore.pdf",device="pdf",width=10,height=6)
@@ -246,9 +275,125 @@ plot_TotalScore=ggplot(data_long,aes(D,TotalScore,color=Group,group=Group,shape=
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
   stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
-  scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
-  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
+  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
+  geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Game Session")+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
   stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3),show.legend = FALSE)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16),legend.position = c(0.71,0.15),legend.title = element_blank())+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+
 plot_TotalScore
+ggsave(plot=plot_TotalScore,"Paper\\FINAL\\TotalScoreSupp.pdf",device="pdf",width=10,height=6)
+
+
+#Game Level
+p_GameLevel=ggplot(data_wide,aes(Group,GameLevel,color=Group,fill=Group,shape=Group))+
+  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
+  scale_color_manual(values=couleurs)+
+  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1)+
+  stat_summary(fun=mean, geom="point",size=4)+
+  ylab("Game Level")+rremove("legend")+scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16) )
+p_GameLevel
+ggsave(plot=p_GameLevel,"Paper\\FINAL\\GameLevel.pdf",device="pdf",width=10,height=6)
+
+
+#PREPOST
+library(ggpattern)
+data_prepost=read.csv("E:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";")
+data_prepost$Group=factor(data_prepost$Group,levels=c("SHAM","STIMSD","STIMHD"))
+levels(data_prepost$Group)=c("Sham","SD-tRNS","HD-tRNS")
+
+data_prepost$PrePost=factor(data_prepost$PrePost,levels=c("Pre","Post"))
+data_prepost$somme=data_prepost$somme-12
+data_prepost[,5:16]=lapply(data_prepost[,5:16],function(x) x-1)
+
+p_prepost=ggplot(data_prepost,aes(x=Group,y=somme,group=PrePost,color=Group,fill=Group,pattern=PrePost))+
+  geom_bar_pattern(stat="summary",position=position_dodge(0.9),width=0.85,fun="mean",
+                   aes(pattern=PrePost,pattern_color=Group,pattern_fill=Group),pattern_angle = 45,
+                   pattern_density = 0.2,
+                   pattern_spacing = 0.02)+
+  scale_pattern_manual(values=c(Pre="none",Post="stripe"))+
+  scale_pattern_fill_manual(values=couleurs)+
+  scale_pattern_color_manual(values=couleurs_alpha)+
+  scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  stat_summary(fun.data = "mean_se",geom="errorbar", fun.args = list(mult = 1),
+               position=position_dodge(0.9),show.legend = FALSE,width=0.3)+
+  theme_pubr()+scale_color_manual(values=couleurs)+scale_fill_manual(values=couleurs_alpha)+
+  guides(pattern = guide_legend(override.aes = list(fill = "white",color="black"),title = ""),
+         fill = guide_legend(override.aes = list(pattern = "none")))+
+  ylab("tRNS adverse effect Questionnaire Score")+scale_y_continuous(breaks = seq(0,5,1),limits = c(0,5))+
+  theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16),
+        legend.position = c(0.2,0.85),legend.box = "horizontal")
+p_prepost
+
+ggsave(plot=p_prepost,"Paper\\FINAL\\QuestionnairePrePost.pdf",device="pdf",width=10,height=6)
+
+d_pp=data_prepost%>%
+  group_by(PrePost,Group)%>%
+  dplyr::summarise(across(Headache:Nauseau,mean))
+
+d_pp=d_pp%>%gather(Question,Answer,Headache:Nauseau)
+d_pp=d_pp%>%unite("GroupPrePost",PrePost:Group,remove=TRUE,sep="_")
+d_pp=d_pp%>%spread(GroupPrePost,Answer)
+
+ftable(Group+PrePost~Headache,data=data_prepost)
+  
+summary(data_prepost)
+sapply(data_prepost[,5:16],sd)
+library(tables)
+library(weights)
+tmp <- tabular( Headache+Difficulties.in.concentrating+Mood.swing+Flickering+Tingling+
+                  Itching+Burning+Pain+Fatigue+Nervousness+Unpleasant.sensations+Nauseau ~ 
+                  (Group*PrePost)* PlusMinus(mean,sd), data=data_prepost )
+tmp[]=lapply(tmp,rd,2,add=FALSE)
+tmp
+latexTable(tmp)
+
+library(table1)
+my.render.cont <- function(x) {
+  with(stats.apply.rounding(stats.default(x), digits=2), c(sprintf("%s (&plusmn; %s)", MEAN, SD)))}
+
+table1::table1(~Headache+Difficulties.in.concentrating+Mood.swing+Flickering+
+         Tingling+Itching+Burning+Pain+Fatigue+Nervousness+Unpleasant.sensations+Nauseau|Group*PrePost,
+       data=data_prepost,render.continuous=my.render.cont,overall = FALSE)
+
+
+#Barplot likert
+library(reshape2)
+m=melt(data_prepost)
+
+m=m%>%group_by(variable,value,Group,PrePost)%>%
+  count(value)
+
+m=subset(m,variable!="somme")
+m$value=as.factor(m$value)
+m=m%>%
+  group_by(variable,Group,PrePost)%>%
+  mutate(freq=(n/sum(n))*100)
+#m$n=(m$n/sum(m$n[]))*100
+data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
+
+ggplot()+geom_bar(data=m,aes(x=reorder(variable,n),y=n,fill=value), position = position_stack(reverse = TRUE),width=0.5, stat="identity")+
+  coord_flip() +theme_pubr()+scale_fill_jco()+
+  theme(legend.position="bottom")+facet_grid(PrePost~Group)
+
+p_questionnaire=ggplot()+
+  geom_col(data=filter(m,PrePost=="Post"),aes(x=variable,y=freq,alpha=value,fill=Group),width=0.5,position= position_stack(reverse = TRUE))+
+  coord_flip()+scale_fill_manual(values=couleurs)+theme_pubr()+
+  facet_grid(~Group)+xlab("tRNS adverse effect Questions (Post Session)")+ylab("")+labs(alpha="Likert Scale")+
+  scale_x_discrete(labels=c(Nauseau="Nausea",Unpleasant.sensations="Unpleasant Sensations",Mood.swing="Mood Swing",Difficulties.in.concentrating="Difficulties in concentrating"))+
+  theme(strip.text.x = element_text(size = 14),axis.title=element_text(margin=0.1,size=18),text =element_text(size=16),strip.background = element_rect(colour="white", fill="white"),legend.position="bottom")+scale_alpha_discrete(range=c(0.3,1))+
+  guides(fill=FALSE)
+ggsave(plot=p_questionnaire,"Paper\\FINAL\\Questionnaire.pdf",device="pdf",width=10,height=6)
+
+
+#Kruskal walis
+filter(data_prepost,PrePost=="Post")%>%
+  kruskal_test(somme~Group)
+
+filter(data_prepost,PrePost=="Post")%>%
+  dunn_test(somme~Group,p.adjust.method = "holm")
