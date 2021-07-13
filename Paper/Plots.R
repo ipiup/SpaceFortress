@@ -159,7 +159,8 @@ txt_S9S1=paste0("Group effect: p=",toString(round(ancova_S9S1$p[1],3)),ancova_S9
 p_S9S1=ggplot(data_wide,aes(Group,DeltaD1D5,color=Group,fill=Group,shape=Group))+
   theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
   scale_color_manual(values=couleurs)+
-  geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
+  geom_half_violin(width=0.8, position = position_nudge(x=-0.15,y=0))+geom_jitter(width=0.1,height = 0.15,size=1,alpha=0.8)+
+  #geom_half_violin(width=0.3, position = position_nudge(x=-0.2,y=0))+geom_jitter(width=0.1)+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1)+
   stat_summary(fun=mean, geom="point",size=4)+
   ylab("Delta Performance (GS9 - GS1)")+rremove("legend")+scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"))+
@@ -300,6 +301,29 @@ p_GameLevel=ggplot(data_wide,aes(Group,GameLevel,color=Group,fill=Group,shape=Gr
 p_GameLevel
 ggsave(plot=p_GameLevel,"Paper\\FINAL\\GameLevel.pdf",device="pdf",width=10,height=6)
 
+kruskal=data_wide%>%
+  kruskal_test(GameLevel~Group)
+
+kruskal$p[kruskal$p<0.001]="<0.001"
+
+grob_post=grobTree(textGrob(paste0("Group effect (Kruskal Walis): p=",kruskal$p," ns"),
+                            x=0.1,y=0.92,hjust=0,vjust=0,gp=gpar(fontsize=16)))
+
+p_gameLevel=ggplot(data_wide,aes(Group,GameLevel,color=Group,fill=Group,shape=Group))+
+  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
+  scale_color_manual(values=couleurs)+
+  geom_half_violin(width=1, position = position_nudge(x=-0.15,y=0))+
+  geom_jitter(alpha=0.6,position=position_jitterdodge(jitter.width = 0.25,jitter.height = 0.1,dodge.width = 0.5))+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.08)+
+  stat_summary(fun=mean, geom="point",size=4)+
+  scale_y_continuous( breaks=seq(0,10,3),limits=c(0,11))+
+  scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"),expand=c(0.5,0))+
+  ylab("Game Level")+rremove("legend")+
+  annotation_custom(grob_post)+
+  theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16))
+p_gameLevel
+ggsave(plot=p_gameLevel,"Paper\\FINAL\\GameLevelv2.pdf",device="pdf",width=10,height=6)
+
 
 #PREPOST
 library(ggpattern)
@@ -329,6 +353,19 @@ p_prepost=ggplot(data_prepost,aes(x=Group,y=somme,group=PrePost,color=Group,fill
   theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16),
         legend.position = c(0.2,0.85),legend.box = "horizontal")
 p_prepost
+
+
+p_post=ggplot(filter(data_prepost,PrePost=="Post"),aes(x=Group,y=somme,color=Group,fill=Group))+
+  geom_bar(stat="summary",fun="mean")+
+  stat_summary(fun.data = "mean_se",geom="errorbar", fun.args = list(mult = 1),show.legend = FALSE,width=0.2)+
+  theme_pubr()+scale_color_manual(values=couleurs)+scale_fill_manual(values=couleurs_alpha)+
+  ylab("tRNS adverse effect Questionnaire Score (Post Session)")+geom_point()+
+  theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16),legend.position = c(0.2,0.85),legend.box = "horizontal")
+p_post
+
+data_prepost%>%
+  group_by(PrePost,Group)%>%
+  summarise(mean(somme))
 
 ggsave(plot=p_prepost,"Paper\\FINAL\\QuestionnairePrePost.pdf",device="pdf",width=10,height=6)
 
@@ -392,8 +429,38 @@ ggsave(plot=p_questionnaire,"Paper\\FINAL\\Questionnaire.pdf",device="pdf",width
 
 
 #Kruskal walis
-filter(data_prepost,PrePost=="Post")%>%
+kruskal=filter(data_prepost,PrePost=="Post")%>%
   kruskal_test(somme~Group)
 
-filter(data_prepost,PrePost=="Post")%>%
+ph_post=filter(data_prepost,PrePost=="Post")%>%
   dunn_test(somme~Group,p.adjust.method = "holm")
+
+ph_post$p.adj.signif[ph_post$p.adj.signif=="ns"]=""
+ph_post$p.adj=round(ph_post$p.adj,3)
+
+ph_post$p.adj[ph_post$p.adj<0.001]="<0.001"
+kruskal$p[kruskal$p<0.001]="<0.001"
+
+grob_post=grobTree(textGrob(paste0("Group effect (Kruskal Walis): p=",kruskal$p,"***"),
+                            x=0.1,y=0.95,hjust=0,vjust=0,gp=gpar(fontsize=16)))
+
+p_post=ggplot(filter(data_prepost,PrePost=="Post"),aes(Group,somme,color=Group,fill=Group,shape=Group))+
+  theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
+  scale_color_manual(values=couleurs)+
+  geom_half_violin(width=1, position = position_nudge(x=-0.15,y=0))+
+  geom_jitter(size=1.5,alpha=0.6,position=position_jitterdodge(jitter.width = 0.5,jitter.height = 0.1,dodge.width = 0.5))+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.08)+
+  stat_summary(fun=mean, geom="point",size=4)+
+  scale_y_continuous( breaks=seq(0,20,3),limits=c(-1,19))+
+  scale_x_discrete(labels=c("Sham","SD-tRNS","HD-tRNS"),expand=c(0.5,0))+
+  ylab("tRNS adverse effect Questionnaire Score \n(Post Session)")+rremove("legend")+
+  add_pvalue(ph_post,y.position=c(15.3,17.3,16.3),
+             label = "p = {p.adj} {p.adj.signif}", inherit.aes = FALSE,label.size=5)+
+  annotation_custom(grob_post)+
+  theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16))
+p_post
+
+ggsave(plot=p_post,"Paper\\FINAL\\Post.pdf",device="pdf",width=10,height=6)
+figure_post=ggarrange(p_gameLevel,p_post,labels=c("A","B"))
+figure_post
+ggsave(plot=figure_post,"Paper\\FINAL\\FigurePostGameLevel.pdf",device="pdf",width=14,height=6)
