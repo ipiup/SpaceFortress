@@ -1,5 +1,4 @@
 ##CLEANING SF TXT FILES & POINT COMPUTATION
-
 date <- function(file_name){
     return(as.Date(substr(file_name, 34, 43), format="%Y-%m-%d"))
 }
@@ -155,7 +154,6 @@ compute_points<-function(file_to_read, point_only=FALSE,press=FALSE,prct=TRUE){#
 
   dp$Group[dp$e1=="new_mine"|dp$e1=="bonus_available"|dp$Type=="FortressShot"]="GameEvent"
 
-  
   dp=subset(dp,!is.na(Type),select=c("Date","Session","Pseudo","system_time","e1","e2","e3","Type","Point","Group"))
   if(point_only==TRUE&press==FALSE){
     #return(dp$Point[e1!="press"]) #returns the points only
