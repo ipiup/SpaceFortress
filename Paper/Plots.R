@@ -1,6 +1,5 @@
 #PaperPlots
 
-
 couleurs=c("#868686FF","#0073C2FF","#A73030FF")
 couleurs_alpha=c("#86868666","#0073C266","#A7303099")
 data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))
@@ -306,7 +305,7 @@ kruskal=data_wide%>%
 
 kruskal$p[kruskal$p<0.001]="<0.001"
 
-grob_post=grobTree(textGrob(paste0("Group effect (Kruskal Walis): p=",kruskal$p," ns"),
+grob_post=grobTree(textGrob(paste0("Group effect (Kruskal-Wallis): p=",kruskal$p),
                             x=0.1,y=0.92,hjust=0,vjust=0,gp=gpar(fontsize=16)))
 
 p_gameLevel=ggplot(data_wide,aes(Group,GameLevel,color=Group,fill=Group,shape=Group))+
@@ -326,8 +325,9 @@ ggsave(plot=p_gameLevel,"Paper\\FINAL\\GameLevelv2.pdf",device="pdf",width=10,he
 
 
 #PREPOST
+require(memoise)
 library(ggpattern)
-data_prepost=read.csv("E:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";")
+data_prepost=read.csv("D:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";")
 data_prepost$Group=factor(data_prepost$Group,levels=c("SHAM","STIMSD","STIMHD"))
 levels(data_prepost$Group)=c("Sham","SD-tRNS","HD-tRNS")
 
@@ -401,6 +401,7 @@ table1::table1(~Headache+Difficulties.in.concentrating+Mood.swing+Flickering+
 
 #Barplot likert
 library(reshape2)
+library(ggsci)
 m=melt(data_prepost)
 
 m=m%>%group_by(variable,value,Group,PrePost)%>%
@@ -418,21 +419,41 @@ ggplot()+geom_bar(data=m,aes(x=reorder(variable,n),y=n,fill=value), position = p
   coord_flip() +theme_pubr()+scale_fill_jco()+
   theme(legend.position="bottom")+facet_grid(PrePost~Group)
 
+library(forcats)
+fct_reorder(m$variable,m$n,max)
+
+prepost_levels=names(table(m$variable))[order(table(m$variable))]
+m$variable=factor(m$variable,levels=prepost_levels)
 p_questionnaire=ggplot()+
-  geom_col(data=filter(m,PrePost=="Post"),aes(x=variable,y=freq,alpha=value,fill=Group),width=0.5,position= position_stack(reverse = TRUE))+
+  geom_col(data=filter(m,PrePost=="Post"),aes(x=variable,y=freq,alpha=value,fill=Group),width=0.5,
+           position= position_stack(reverse = TRUE))+
   coord_flip()+scale_fill_manual(values=couleurs)+theme_pubr()+
   facet_grid(~Group)+xlab("tRNS adverse effect Questions (Post Session)")+ylab("")+labs(alpha="Likert Scale")+
   scale_x_discrete(labels=c(Nauseau="Nausea",Unpleasant.sensations="Unpleasant Sensations",Mood.swing="Mood Swing",Difficulties.in.concentrating="Difficulties in concentrating"))+
   theme(strip.text.x = element_text(size = 14),axis.title=element_text(margin=0.1,size=18),text =element_text(size=16),strip.background = element_rect(colour="white", fill="white"),legend.position="bottom")+scale_alpha_discrete(range=c(0.3,1))+
   guides(fill=FALSE)
+p_questionnaire
+
 ggsave(plot=p_questionnaire,"Paper\\FINAL\\Questionnaire.pdf",device="pdf",width=10,height=6)
 
+# Kruskal Wallis on mean average af the 3 days
 
-#Kruskal walis
-kruskal=filter(data_prepost,PrePost=="Post")%>%
+data_post_mean=data_prepost%>%
+  group_by(Pseudo,Group,PrePost)%>%
+  summarise(somme=mean(somme))
+
+
+data_post_mean=subset(data_prepost,PrePost=="Post")
+data_post_mean=data_post_mean%>%
+  group_by(Pseudo,Group)%>%
+  summarise(somme=mean(somme))
+
+data_post_mean=ungroup(data_post_mean)
+kruskal=data_post_mean%>%
   kruskal_test(somme~Group)
+kruskal_test(somme~Group,data=data_post_mean)
 
-ph_post=filter(data_prepost,PrePost=="Post")%>%
+ph_post=data_post_mean%>%
   dunn_test(somme~Group,p.adjust.method = "holm")
 
 ph_post$p.adj.signif[ph_post$p.adj.signif=="ns"]=""
@@ -441,10 +462,9 @@ ph_post$p.adj=round(ph_post$p.adj,3)
 ph_post$p.adj[ph_post$p.adj<0.001]="<0.001"
 kruskal$p[kruskal$p<0.001]="<0.001"
 
-grob_post=grobTree(textGrob(paste0("Group effect (Kruskal Walis): p=",kruskal$p,"***"),
+grob_post=grobTree(textGrob(paste0("Group effect (Kruskal-Wallis): p=",kruskal$p," *"),
                             x=0.1,y=0.95,hjust=0,vjust=0,gp=gpar(fontsize=16)))
-
-p_post=ggplot(filter(data_prepost,PrePost=="Post"),aes(Group,somme,color=Group,fill=Group,shape=Group))+
+p_post=ggplot(data_post_mean,aes(Group,somme,color=Group,fill=Group,shape=Group))+
   theme_pubr()+scale_fill_manual(values=couleurs_alpha)+
   scale_color_manual(values=couleurs)+
   geom_half_violin(width=1, position = position_nudge(x=-0.15,y=0))+
@@ -460,7 +480,10 @@ p_post=ggplot(filter(data_prepost,PrePost=="Post"),aes(Group,somme,color=Group,f
   theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16))
 p_post
 
+
 ggsave(plot=p_post,"Paper\\FINAL\\Post.pdf",device="pdf",width=10,height=6)
 figure_post=ggarrange(p_gameLevel,p_post,labels=c("A","B"))
 figure_post
 ggsave(plot=figure_post,"Paper\\FINAL\\FigurePostGameLevel.pdf",device="pdf",width=14,height=6)
+
+

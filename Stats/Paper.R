@@ -1,5 +1,4 @@
 #Paper Plots
-
 library(reshape2)
 
 data_wide$Group=factor(data_wide$Group,levels=c("SHAM","STIMSD","STIMHD"))

@@ -21,7 +21,7 @@ if(b_Clean=="NO"){
   #Clean File with points writing
   invisible(lapply(fil,write_file,path=path,path_clean=path_clean)) #launch the cleaning
 }else{
-  # path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
+  #path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
   path_clean="E:\\ISAE-2021\\Alldata\\Data_clean\\"
   
 }
@@ -69,3 +69,13 @@ data_wide$GameLevelLog=log(data_wide$GameLevel+1)
 
 df_demographique=subset(df_demographique,identifiant!="CP1809"&identifiant!="MM0301"&identifiant!="SP0801"&identifiant!="CH0205") 
 df_demographique=subset(df_demographique,identifiant!="LM2411"&identifiant!="EC1603"&identifiant!="TB0301")
+
+
+#data_wide_prepost
+data_wide_prepost=subset(data_wide,select=c("Pseudo","Group","D01P1","D05P1"))
+data_wide_prepost$Change=data_wide_prepost$D05P1-data_wide_prepost$D01P1
+write.csv(data_wide_prepost,"Data_wide_PrePostJ5.csv",quote=FALSE)
+
+data_wide_prepost=subset(data_wide,select=c("Pseudo","Group","D01P1","D14P1"))
+data_wide_prepost$Change=data_wide_prepost$D14P1-data_wide_prepost$D01P1
+write.csv(data_wide_prepost,"Data_wide_PrePostJ14.csv",quote=FALSE)
