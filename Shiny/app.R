@@ -1,10 +1,22 @@
 library(shiny)
 library(shinyFiles)
+source("E:\\SpaceFortress\\Clean\\Clean_SF.R")
 
 fun_clean<-function(path,path_clean){
   fil=list.files(path=path,recursive = T)
   print(fil)
   lapply(fil,write_file,path=path,path_clean=path_clean)
+}
+
+fun_read_clean<-function(path_clean){
+  fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
+  data=read_final_Score(fil_clean,path_clean,detailed = FALSE) #Create the data 
+  df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
+  for(str_pseudo in unique(data$Pseudo)){
+    data$Treatment[data$Pseudo==str_pseudo]=as.numeric(df_GROUPS$Treatment[df_GROUPS$Pseudo==str_pseudo])
+  }
+  data$Pseudo[data$Pseudo=="SL2804"]="SL0804"
+  return(data) 
 }
 
 ui <- fluidPage(
@@ -21,18 +33,21 @@ ui <- fluidPage(
     # textInput("filename","Choose a file name"),
     # actionButton("namego","go"),
     # textOutput("b"),
-    actionButton("filego","write")
+    actionButton("writeFile","Write Clean Files"),
+    actionButton("readClean","Read Clean Files")
   ),
   mainPanel(
-    tabsetPanel(
-      tabPanel("Plot", plotOutput("plot")), 
-      tabPanel("Summary", verbatimTextOutput("summary")), 
-      tabPanel("Table", tableOutput("table"))
-    )
+    DT::dataTableOutput('tabledata')
+    # tabsetPanel(
+    #   tabPanel("Plot", plotOutput("plot")), 
+    #   tabPanel("Summary", verbatimTextOutput("summary")), 
+    #   tabPanel("Table", tableOutput("table"))
+    # )
   )
   ))
 
 server <- function(input, output) {
+
   shinyDirChoose(input,'dir_raw',roots = c(files = "E:"),filetypes = c('', 'txt'))
   shinyDirChoose(input,'dir_clean',roots = c(files = 'E:'),filetypes = c('', 'txt'))
   
@@ -68,9 +83,18 @@ server <- function(input, output) {
     }
   )
 
-  reac<-eventReactive(input$filego,{fun_clean(global$datapath,global_cl$datapath)})
-  #reac<-eventReactive(input$filego,{print(global_cl$datapath)})
+  #reac<-eventReactive(input$writeFile,{fun_clean(global$datapath,global_cl$datapath)})
+  reac<-eventReactive(input$readClean,{fun_read_clean(global_cl$datapath)})
+
+  #reac<-eventReactive(input$readClean,{print(global$datapath)})
   observe(reac())
+  dt<-reactive({
+    fun_read_clean(global_cl$datapath)
+  })
+  output$tabledata<-DT::renderDataTable({
+    dt()
+    })
+
 }
 
 # Run the application

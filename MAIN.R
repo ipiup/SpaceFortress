@@ -27,7 +27,7 @@ if(b_Clean=="NO"){
 }
 #CLEAN DATA READING
 fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
-data=read_final_Score(fil_clean,detailed = FALSE) #Create the data 
+data=read_final_Score(fil_clean,path_clean,detailed = FALSE) #Create the data 
 #df_GROUPS=read.table(choose.files(default = "", caption = "Select the GROUP.txt file"),header=TRUE)#Choose the Group txt file
 df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
 for(str_pseudo in unique(data$Pseudo)){

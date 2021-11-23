@@ -1,3 +1,12 @@
+
+library("stringr")
+library("foreach")
+library("bestNormalize")
+library("SciViews")
+library("ggplot2")
+library("ggpubr")
+library("dplyr")
+library("broom")
 ##CLEANING SF TXT FILES & POINT COMPUTATION
 date <- function(file_name){
     return(as.Date(substr(file_name, 34, 43), format="%Y-%m-%d"))
@@ -320,7 +329,7 @@ read_data_score<-function(files_data,add_press=FALSE){
   return(df_data)
 }
 
-read_final_Score<-function(files_data,detailed=FALSE){
+read_final_Score<-function(files_data,path_clean=path_clean,detailed=FALSE){
   if(detailed){
     df_data=foreach(i=1:length(files_data),.combine = rbind)%do%{
       file=read.table(paste0(path_clean,"/",files_data[i]), header=TRUE, sep="\t",dec=".",fill=TRUE)
