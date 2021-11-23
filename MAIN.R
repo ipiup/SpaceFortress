@@ -70,12 +70,34 @@ data_wide$GameLevelLog=log(data_wide$GameLevel+1)
 df_demographique=subset(df_demographique,identifiant!="CP1809"&identifiant!="MM0301"&identifiant!="SP0801"&identifiant!="CH0205") 
 df_demographique=subset(df_demographique,identifiant!="LM2411"&identifiant!="EC1603"&identifiant!="TB0301")
 
-
 #data_wide_prepost
 data_wide_prepost=subset(data_wide,select=c("Pseudo","Group","D01P1","D05P1"))
 data_wide_prepost$Change=data_wide_prepost$D05P1-data_wide_prepost$D01P1
-write.csv(data_wide_prepost,"Data_wide_PrePostJ5.csv",quote=FALSE)
+#write.csv(data_wide_prepost,"Data_wide_PrePostJ5.csv",quote=FALSE)
 
 data_wide_prepost=subset(data_wide,select=c("Pseudo","Group","D01P1","D14P1"))
 data_wide_prepost$Change=data_wide_prepost$D14P1-data_wide_prepost$D01P1
-write.csv(data_wide_prepost,"Data_wide_PrePostJ14.csv",quote=FALSE)
+#write.csv(data_wide_prepost,"Data_wide_PrePostJ14.csv",quote=FALSE)
+
+###APM
+not_again=levels(factor(df_APM_ScM$Pseudo)) #do not compute APM ScM again
+fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
+
+#CLEAN FILES : compute scores/min and APM
+path_ScM_APM="E:\\ISAE-2021\\Alldata\\ScM\\ScM_APM\\"
+#df_APM_ScM=lapply(fil_clean,scores_apm_fct)
+for(i in 1:length(not_again)){
+  fil_clean=fil_clean[!grepl(not_again[i],fil_clean)]
+}
+#write_APM_ScM(fil_clean) #Matrix: APM and Scores per Minute of Participants, for each session
+
+fil_APM_ScM=list.files(path=path_ScM_APM,recursive = T)
+df_APM_ScM=read_APM_ScM(fil_APM_ScM)
+#outliers
+df_APM_ScM=subset(df_APM_ScM,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301"&Pseudo!="CP1809"&Pseudo!="MM0301"&Pseudo!="SP0801"&Pseudo!="CH0205")
+df_APM_ScM$Pseudo[df_APM_ScM$Pseudo=="SL2804"]="SL0804"
+for(str_pseudo in unique(df_APM_ScM$Pseudo)){
+   df_APM_ScM$Group[df_APM_ScM$Pseudo==str_pseudo]=data_wide$Group[data_wide$Pseudo==str_pseudo]
+}
+
+

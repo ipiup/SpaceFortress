@@ -226,3 +226,43 @@ violin_plot
 
 
 
+#####Septembre 2021
+#Plots thèse quentin participant ME1310 D1 & D5
+
+df_1=read.table("E:/ISAE-2021/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_GF0912_D02P2.txt",sep="\t")
+df_1$T=c(1:540)
+
+df=read.table("E:/ISAE-2021/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_JM1704_D02P2.txt",sep="\t")
+df$T=c(1:540)
+
+
+p=ggplot()+theme_pubr()+scale_x_continuous(breaks=seq(0,540,by=60))+
+  scale_y_continuous(breaks = seq(-1000,1500,by=500),limits=c(-1000,1500))+
+  ylab("Score per Minute")+xlab("Time (s)")+
+  geom_line(data=df,aes(T,ScoresMin),color="blue")+
+  geom_smooth(data=df,aes(T,ScoresMin),method="loess",span=0.1,level=0.95,color="blue")+
+  geom_line(data=df_1,aes(T,ScoresMin),color="red")+
+  geom_smooth(data=df_1,aes(T,ScoresMin),method="loess",span=0.1,level=0.95,color="red")
+p+annotate("text",x=500,y=-500,label="Participant 1",color="red")+
+  annotate("text",x=500,y=-600,label="Participant 2",color="blue")
+
+p_Scm=ggplot(df_1,aes(T,ScoresMin))+theme_pubr()+geom_line()+scale_x_continuous(breaks=seq(0,540,by=60))+
+  scale_y_continuous(breaks = seq(-1000,1500,by=500),limits=c(-1000,1500))+
+  ylab("Score per Minute")+xlab("Time (s)")+geom_smooth(method="loess",span=0.1,level=0.95)
+p_APM=ggplot(df_1,aes(T,APM))+theme_pubr()+geom_line()+scale_x_continuous(breaks=seq(0,540,by=60))+
+  scale_y_continuous(breaks = seq(0,150,by=50),limits=c(0,150))+
+  ylab("Action per Minute")+xlab("Time (s)")+geom_smooth(method="loess",span=0.1,level=0.95)
+
+ggarrange(p_Scm,p_APM,nrow=2)
+
+
+p_Scm=ggplot(df,aes(T,ScoresMin))+theme_pubr()+geom_line()+scale_x_continuous(breaks=seq(0,540,by=60))+
+  scale_y_continuous(breaks = seq(-1000,1500,by=500),limits=c(-1000,1500))+
+  ylab("Score per Minute")+xlab("Time (s)")+geom_smooth(method="loess",span=0.1,level=0.95)
+p_APM=ggplot(df,aes(T,APM))+theme_pubr()+geom_line()+scale_x_continuous(breaks=seq(0,540,by=60))+
+  scale_y_continuous(breaks = seq(0,150,by=50),limits=c(0,150))+
+  ylab("Action per Minute")+xlab("Time (s)")+geom_smooth(method="loess",span=0.1,level=0.95)
+
+ggarrange(p_Scm,p_APM,nrow=2)
+
+
