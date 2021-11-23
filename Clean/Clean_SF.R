@@ -228,11 +228,15 @@ write_APM_ScM <- function(clean_file_to_read){
 read_APM_ScM<-function(files_APM_ScM){
   df_APM_ScM=foreach(i=1:length(files_APM_ScM),.combine=rbind)%do%{
     file_APM_ScM=read.table(paste0(path_ScM_APM,files_APM_ScM[i]),header=TRUE,sep="\t")
+    # list(Date=file_APM_ScM$Date[1],Session=file_APM_ScM$Session[1],Pseudo=file_APM_ScM$Pseudo[1]
+    #   ,ScoresMin=file_APM_ScM$ScoresMin,FlightScore=file_APM_ScM$FlightScore,BonusScore=file_APM_ScM$BonusScore
+    #   ,MineScore=file_APM_ScM$MineScore,FortressScore=file_APM_ScM$FortressScore,APM=file_APM_ScM$APM,
+    #   TotalScore=file_APM_ScM$TotalScore[1],Flight=file_APM_ScM$Flight[1],Bonus=file_APM_ScM$Bonus[1],Mine=file_APM_ScM$Mine[1]
+    #   ,Fortress=file_APM_ScM$Fortress[1],MeanScore=round(mean(unlist(file_APM_ScM$ScoresMin)),0))  
     list(Date=file_APM_ScM$Date[1],Session=file_APM_ScM$Session[1],Pseudo=file_APM_ScM$Pseudo[1]
-      ,ScoresMin=file_APM_ScM$ScoresMin,FlightScore=file_APM_ScM$FlightScore,BonusScore=file_APM_ScM$BonusScore
-      ,MineScore=file_APM_ScM$MineScore,FortressScore=file_APM_ScM$FortressScore,APM=file_APM_ScM$APM,
-      TotalScore=file_APM_ScM$TotalScore[1],Flight=file_APM_ScM$Flight[1],Bonus=file_APM_ScM$Bonus[1],Mine=file_APM_ScM$Mine[1]
-      ,Fortress=file_APM_ScM$Fortress[1],MeanScore=round(mean(unlist(file_APM_ScM$ScoresMin)),0))  
+         ,ScoresMin=file_APM_ScM$ScoresMin,FlightScore=file_APM_ScM$FlightScore,BonusScore=file_APM_ScM$BonusScore
+         ,MineScore=file_APM_ScM$MineScore,FortressScore=file_APM_ScM$FortressScore,APM=file_APM_ScM$APM,
+         TotalScore=file_APM_ScM$TotalScore[1],MeanScore=round(mean(unlist(file_APM_ScM$ScoresMin)),0))
     }
   #colnames(df_APM_ScM)=c("Date","Session","Pseudo","ScoresMin","FlightScore","BonusScore","MineScore","FortressScore","APM","TotalScore","Flight","Bonus","Mine","Fortress","MeanScore")
   #rownames(df_APM_ScM)=1:nrow(df_APM_ScM)
@@ -241,10 +245,10 @@ read_APM_ScM<-function(files_APM_ScM){
   df_APM_ScM$Session=unlist(df_APM_ScM$Session)
   df_APM_ScM$Pseudo=unlist(df_APM_ScM$Pseudo)
   df_APM_ScM$TotalScore=unlist(df_APM_ScM$TotalScore)
-  df_APM_ScM$Flight=unlist(df_APM_ScM$Flight)
-  df_APM_ScM$Bonus=unlist(df_APM_ScM$Bonus)
-  df_APM_ScM$Mine=unlist(df_APM_ScM$Mine)
-  df_APM_ScM$Fortress=unlist(df_APM_ScM$Fortress)
+  # df_APM_ScM$Flight=unlist(df_APM_ScM$Flight)
+  # df_APM_ScM$Bonus=unlist(df_APM_ScM$Bonus)
+  # df_APM_ScM$Mine=unlist(df_APM_ScM$Mine)
+  # df_APM_ScM$Fortress=unlist(df_APM_ScM$Fortress)
   df_APM_ScM$MeanScore=unlist(df_APM_ScM$MeanScore)
   
   return(df_APM_ScM)
