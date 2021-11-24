@@ -9,7 +9,7 @@ fun_clean<-function(path,path_clean){
   lapply(fil,write_file,path=path,path_clean=path_clean)
 }
 
-fun_read_clean<-function(path_clean){
+fun_read_clean<-function(path_clean,wide=TRUE){
   fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
   data=read_final_Score(fil_clean,path_clean,detailed = FALSE) #Create the data 
   df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
@@ -28,8 +28,11 @@ fun_read_clean<-function(path_clean){
   data_long=subset(data_long,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on long format
   data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on wide format
   
-  
-  return(data_wide) 
+  if(wide){
+    return(data_wide)
+  }else{
+    return(data_long)
+  }
 }
 
 ui <- fluidPage(
@@ -43,8 +46,12 @@ ui <- fluidPage(
                  actionButton("writeFile","Write Clean Files")),
         tabPanel("Clean Files",shinyDirButton("dir_clean", "Clean File directory", "Upload"),
                  verbatimTextOutput("dir_clean", placeholder = TRUE),
-                 checkboxGroupInput("columns", "Choose columns"),
-                 actionButton("displayTab","Show Data"))),
+                 radioButtons("wideOrLong","Data Format",choices=c("Wide","Long")),
+                 checkboxGroupInput("parameters","Choose features"),
+                 actionButton("displayTab","Show Data")),
+        tabPanel("Data Parameters",
+                 
+                 checkboxGroupInput("columns", "Choose columns"))),
       
   ),
   mainPanel(
@@ -56,7 +63,6 @@ server <- function(input, output,session) {
 
   shinyDirChoose(input,'dir_raw',roots = c(files = "E:"),filetypes = c('', 'txt'))
   shinyDirChoose(input,'dir_clean',roots = c(files = 'E:'),filetypes = c('', 'txt'))
-  
   #Raw File path
   global <- reactiveValues(datapath = "")#getwd())
   dir_raw <- reactive(input$dir_raw)
@@ -74,7 +80,7 @@ server <- function(input, output,session) {
     }
   )
   #Cleaned Data Path
-  global_cl<-reactiveValues(datapath = "")#getwd())
+  global_cl<-reactiveValues(datapath = "E:\\SpaceFortress\\TESTSHINY\\Clean")#getwd())
   dir_clean <- reactive(input$dir_clean)
   output$dir_clean <- renderText({
     global_cl$datapath
@@ -90,45 +96,60 @@ server <- function(input, output,session) {
     }
   )
 
-  #reac<-eventReactive(input$writeFile,{fun_clean(global$datapath,global_cl$datapath)})
- # reac<-eventReactive(input$readClean,{fun_read_clean(global_cl$datapath)})
-
-  #reac<-eventReactive(input$readClean,{print(global$datapath)})
-  #observe(reac())
-
+  #Clean files into dataframe
   data<-reactive({
-    fun_read_clean(global_cl$datapath)
+    if(input$wideOrLong=="Wide"){
+      fun_read_clean(global_cl$datapath,TRUE)
+    }else{
+      fun_read_clean(global_cl$datapath,FALSE)
+    }
   })
   
-  react_columns<-eventReactive(input$displayTab,{
-    # if(is.null(data()))
-    #   return()
-
+  #Columns selection
+  react_columns<-eventReactive(input$wideOrLong,{
     dat<-data()
-    colnames <- names(dat)
-    updateCheckboxGroupInput(session,"columns",choices=colnames)
-    # checkboxGroupInput("columns", "Choose columns",
-    #                    choices  = c("colnames","hello"),
-    #                    selected = c("colnames"))
-    #print(names(dat))
-  })
-  output$columns<-renderUI({react_columns()})
-  observe(react_columns())
+    col = names(dat)
+    updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+    if(input$wideOrLong=="Wide"){
+      updateCheckboxGroupInput(session,"parameters",choices=c("Delta TotalScore","Delta Sub-Scores","Blinded"))
+    }else{
+      updateCheckboxGroupInput(session,"parameters",choices=c("Sub-Scores","Blinded"))
+    }
 
+  })
+  observe(react_columns())
+  react_parameters<-reactive({
+    dat<-data()
+    col=names(dat)
+    if(!is.null(input$parameters)){
+      if("Blinded"%in%input$parameters){
+        
+        col = col[col!="Group"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
+      if("Sub-Scores"%in%input$parameters){
+        col=col[col!="Flight"&col!="Bonus"&col!="Mine"&col!="Fortress"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
+    }
+
+  })
+  observe(react_parameters())
   data_subset<-reactive({
+
     data()%>%
-      #select(input$choose_columns)
-      select(input$columns)
-  }
-  )
+      select(input$columns,-Group)
+  })
+  observe(print("Blinded"%in%input$parameters))
+  #Display dataframe
   reac_tab<-eventReactive(input$displayTab,{ 
     
-    output$tabledata<-DT::renderDataTable({
-      data_subset()
-    })
+    output$tabledata<-DT::renderDataTable(data_subset(),rownames=FALSE,filter = 'top',
+                                          options = list(pageLength = 25, autoWidth = TRUE,dom = 'ltipr'))
   })
   observe(reac_tab())
 
+  
 }
 
 # Run the application
