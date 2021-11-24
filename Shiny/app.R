@@ -118,27 +118,20 @@ server <- function(input, output,session) {
 
   })
   observe(react_columns())
-  react_parameters<-reactive({
+  react_parameters<-eventReactive(input$parameters,{
     dat<-data()
     col=names(dat)
-    if(!is.null(input$parameters)){
-      if("Blinded"%in%input$parameters){
-        
-        col = col[col!="Group"]
-        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
-      }
+
       if("Sub-Scores"%in%input$parameters){
         col=col[col!="Flight"&col!="Bonus"&col!="Mine"&col!="Fortress"]
         updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
       }
-    }
-
+    
   })
   observe(react_parameters())
   data_subset<-reactive({
-
     data()%>%
-      select(input$columns,-Group)
+      select(input$columns)
   })
   observe(print("Blinded"%in%input$parameters))
   #Display dataframe
