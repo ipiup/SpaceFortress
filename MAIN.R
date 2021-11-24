@@ -37,7 +37,7 @@ data$Pseudo[data$Pseudo=="SL2804"]="SL0804"
 
 #Add Demographic information
 #df_demographique=read.csv(choose.files(default = "", caption = "Select the Demographic.csv file"),head=TRUE,dec = ",",sep=";")
-df_demographique=read.csv("E:\\demographicsbrut.csv",head=TRUE,dec = ",",sep=";")
+df_demographique=read.csv("E:\\SpaceFortress\\Data\\demographicsbrut.csv",head=TRUE,dec = ",",sep=";")
 
 names(df_demographique)[names(df_demographique)=="Votre.âge"]="Age"
 data_long=demographie_long(data,df_demographique)#LONG FORMAT of the data with dem info
