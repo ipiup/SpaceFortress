@@ -22,35 +22,26 @@ fun_read_clean<-function(path_clean){
 ui <- fluidPage(
   titlePanel("Space Fortress Data Extraction"),
   
-  sidebarLayout(
     sidebarPanel(
-    #Raw File directory
-    shinyDirButton("dir_raw", "Raw File directory", "Upload"),
-    verbatimTextOutput("dir_raw", placeholder = TRUE),
-    #Clean File directory
-    shinyDirButton("dir_clean", "Clean File directory", "Upload"),
-    verbatimTextOutput("dir_clean", placeholder = TRUE),
-    # textInput("filename","Choose a file name"),
-    # actionButton("namego","go"),
-    # textOutput("b"),
-    actionButton("writeFile","Write Clean Files"),
-    actionButton("readClean","Read Clean Files")
+      
+      tabsetPanel(
+        tabPanel("Raw Files", shinyDirButton("dir_raw", "Raw File directory", "Upload"),
+                 verbatimTextOutput("dir_raw", placeholder = TRUE),
+                 actionButton("writeFile","Write Clean Files")),
+        tabPanel("Clean Files",shinyDirButton("dir_clean", "Clean File directory", "Upload"),
+                 verbatimTextOutput("dir_clean", placeholder = TRUE),actionButton("displayTab","Show Data"))),
   ),
   mainPanel(
     DT::dataTableOutput('tabledata')
-    # tabsetPanel(
-    #   tabPanel("Plot", plotOutput("plot")), 
-    #   tabPanel("Summary", verbatimTextOutput("summary")), 
-    #   tabPanel("Table", tableOutput("table"))
-    # )
   )
-  ))
+  )
 
 server <- function(input, output) {
 
   shinyDirChoose(input,'dir_raw',roots = c(files = "E:"),filetypes = c('', 'txt'))
   shinyDirChoose(input,'dir_clean',roots = c(files = 'E:'),filetypes = c('', 'txt'))
   
+  #Raw File path
   global <- reactiveValues(datapath = "")#getwd())
   dir_raw <- reactive(input$dir_raw)
   output$dir_raw <- renderText({
@@ -66,7 +57,7 @@ server <- function(input, output) {
       
     }
   )
-  
+  #Cleaned Data Path
   global_cl<-reactiveValues(datapath = "")#getwd())
   dir_clean <- reactive(input$dir_clean)
   output$dir_clean <- renderText({
@@ -88,12 +79,14 @@ server <- function(input, output) {
 
   #reac<-eventReactive(input$readClean,{print(global$datapath)})
   observe(reac())
+
   dt<-reactive({
     fun_read_clean(global_cl$datapath)
   })
-  output$tabledata<-DT::renderDataTable({
+  reac_tab<-eventReactive(input$displayTab,{  output$tabledata<-DT::renderDataTable({
     dt()
-    })
+  })})
+  observe(reac_tab())
 
 }
 
