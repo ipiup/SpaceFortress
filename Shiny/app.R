@@ -118,25 +118,31 @@ server <- function(input, output,session) {
 
   })
   observe(react_columns())
-  react_parameters<-eventReactive(input$parameters,{
+
+  react_parameters<-reactive({
     dat<-data()
     col=names(dat)
-
+    updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
       if("Sub-Scores"%in%input$parameters){
+        print("subscores")
         col=col[col!="Flight"&col!="Bonus"&col!="Mine"&col!="Fortress"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
+      if("Blinded"%in%input$parameters){
+        col=col[col!="Group"]
         updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
       }
     
   })
   observe(react_parameters())
+  #Parameters for columns display 
   data_subset<-reactive({
     data()%>%
       select(input$columns)
   })
-  observe(print("Blinded"%in%input$parameters))
+  
   #Display dataframe
   reac_tab<-eventReactive(input$displayTab,{ 
-    
     output$tabledata<-DT::renderDataTable(data_subset(),rownames=FALSE,filter = 'top',
                                           options = list(pageLength = 25, autoWidth = TRUE,dom = 'ltipr'))
   })
