@@ -27,6 +27,7 @@ fun_read_clean<-function(path_clean,wide=TRUE){
   #OUTLIERS : LM2411 & EC1603 & TB0301
   data_long=subset(data_long,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on long format
   data_wide=subset(data_wide,Pseudo!="LM2411"&Pseudo!="EC1603"&Pseudo!="TB0301")#outliers on wide format
+  data_long=data_long[colnames(data_long)[colnames(data_long)!="Treatment"]]
   
   if(wide){
     return(data_wide)
@@ -111,7 +112,7 @@ server <- function(input, output,session) {
     col = names(dat)
     updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
     if(input$wideOrLong=="Wide"){
-      updateCheckboxGroupInput(session,"parameters",choices=c("Delta TotalScore","Delta Sub-Scores","Blinded"))
+      updateCheckboxGroupInput(session,"parameters",choices=c("P1","P2","Delta TotalScore","Delta Sub-Scores","Blinded"),selected=c("P1","P2"))
     }else{
       updateCheckboxGroupInput(session,"parameters",choices=c("Sub-Scores","Blinded"))
     }
@@ -123,8 +124,7 @@ server <- function(input, output,session) {
     dat<-data()
     col=names(dat)
     updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
-      if("Sub-Scores"%in%input$parameters){
-        print("subscores")
+      if(!"Sub-Scores"%in%input$parameters){
         col=col[col!="Flight"&col!="Bonus"&col!="Mine"&col!="Fortress"]
         updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
       }
@@ -132,7 +132,22 @@ server <- function(input, output,session) {
         col=col[col!="Group"]
         updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
       }
-    
+      if(!"Delta Sub-Scores"%in%input$parameters){
+        col=col[col!="DeltaD1D14Flight"&col!="DeltaD14D5Flight"&col!="DeltaD1D14Bonus"&col!="DeltaD14D5Bonus"&col!="DeltaD1D14Mine"&col!="DeltaD14D5Mine"&col!="DeltaD1D14Fortress"&col!="DeltaD14D5Fortress"&col!="DeltaD5D1Fortress"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
+      if(!"Delta TotalScore"%in%input$parameters){
+        col=col[col!="DeltaD1D14"&col!="DeltaD14D5"&col!="DeltaD1D5"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
+      if(!"P1"%in%input$parameters){
+        col=col[col!="D01P1"&col!="D02P1"&col!="D03P1"&col!="D04P1"&col!="D05P1"&col!="D14P1"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
+      if(!"P2"%in%input$parameters){
+        col=col[col!="D02P2"&col!="D03P2"&col!="D04P2"&col!="D05P2"&col!="D14P2"]
+        updateCheckboxGroupInput(session,"columns",choices=col,selected=col)
+      }
   })
   observe(react_parameters())
   #Parameters for columns display 
@@ -141,7 +156,6 @@ server <- function(input, output,session) {
       select(input$columns)
   })
   
-  #Display dataframe
   reac_tab<-eventReactive(input$displayTab,{ 
     output$tabledata<-DT::renderDataTable(data_subset(),rownames=FALSE,filter = 'top',
                                           options = list(pageLength = 25, autoWidth = TRUE,dom = 'ltipr'))
