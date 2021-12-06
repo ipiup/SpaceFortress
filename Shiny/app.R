@@ -44,13 +44,15 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Raw Files", shinyDirButton("dir_raw", "Raw File directory", "Upload"),
                  verbatimTextOutput("dir_raw", placeholder = TRUE),
-                 actionButton("writeFile","Write Clean Files")),
-        tabPanel("Clean Files",shinyDirButton("dir_clean", "Clean File directory", "Upload"),
+                 shinyDirButton("dir_clean", "Clean File directory", "Upload"),
                  verbatimTextOutput("dir_clean", placeholder = TRUE),
+                 actionButton("writeFile","Write Clean Files")),
+        tabPanel("Data Parameters",#,shinyDirButton("dir_clean", "Clean File directory", "Upload"),
+                 #verbatimTextOutput("dir_clean", placeholder = TRUE),
                  radioButtons("wideOrLong","Data Format",choices=c("Wide","Long")),
                  checkboxGroupInput("parameters","Choose features"),
                  actionButton("displayTab","Show Data")),
-        tabPanel("Data Parameters",
+        tabPanel("Columns Selection",
                  
                  checkboxGroupInput("columns", "Choose columns"))),
       
@@ -161,8 +163,6 @@ server <- function(input, output,session) {
                                           options = list(pageLength = 25, autoWidth = TRUE,dom = 'ltipr'))
   })
   observe(reac_tab())
-
-  
 }
 
 # Run the application
