@@ -47,3 +47,4 @@ data= data[rowSums(is.na(data)) != ncol(data), ] #completely NA rows
 
 data =t(data)
 data[,1]=toupper(substring(data[,1],1,2))
+data=as.data.frame(data)

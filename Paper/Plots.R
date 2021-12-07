@@ -44,6 +44,7 @@ eq_HD=paste0("y= ",round(coef(fit_HD)[1])," + ",round(coef(fit_HD)[2]),"*ln(x)")
 grob_SHAM=grobTree(textGrob(eq_SHAM,x=0.77,y=0.195,hjust=0,gp=gpar(col="#868686FF")),gp=gpar(fontsize=15))
 grob_SD=grobTree(textGrob(eq_SD,x=0.77,y=0.145,hjust=0,gp=gpar(col="#0073C2FF")),gp=gpar(fontsize=15))
 grob_HD=grobTree(textGrob(eq_HD,x=0.77,y=0.095,hjust=0,gp=gpar(col="#A73030FF")),gp=gpar(fontsize=15))
+#grob_all=grobTree(textGrob(expression("y = "~alpha~"+"~beta~"*ln(x)"),x=0.1,y=0.85,hjust=0,gp=gpar(col="black")),gp=gpar(fontsize=15))
 
 plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
@@ -57,9 +58,10 @@ plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()
   scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
   scale_y_continuous(breaks =seq(0, 15000, by = 2500))+
+  #annotation_custom(grob_all)+
   annotation_custom(grob_SHAM)+ annotation_custom(grob_SD)+ annotation_custom(grob_HD)+
   theme(legend.position = c(0.69,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
-        axis.title = element_text(size=18,margin=0.1),text=element_text(size=16))+
+        axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
   annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
 plot_LR
 
