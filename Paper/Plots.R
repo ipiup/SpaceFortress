@@ -140,7 +140,8 @@ p_S11S9=ggplot(data_wide,aes(Group,DeltaD14D5,color=Group,fill=Group,shape=Group
              label = "p = {round(p.adj,3)}", inherit.aes = FALSE,label.size=5,fontface="bold")+
   annotation_custom(grob_S11S9)+
   #annotate("text",x=1,y=11300,label=text_S11S9,size=6,hjust=0)+
-  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )
+  theme(axis.title=element_text(size=18,margin=0.1),text =element_text(size=16) )#+
+  #geom_hline(yintercept=0,linetype="dashed")
 p_S11S9  
 
 #S11-S1
@@ -232,7 +233,7 @@ ggsave(plot=f_delta,"Paper\\FINAL\\FigureDelta.pdf",device="pdf",width=14,height
 
 ggsave(plot=p_S11S1,"Paper\\FINAL\\DeltaS11S1.pdf",device="pdf",width=10,height=6)
 ggsave(plot=p_S9S1,"Paper\\FINAL\\DeltaS9S1.pdf",device="pdf",width=10,height=6)
-ggsave(plot=p_S11S9,"Paper\\FINAL\\DeltaS11S9.pdf",device="pdf",width=10,height=6)
+ggsave(plot=p_S11S9,"Paper\\FINAL\\DeltaS11S9_0line.pdf",device="pdf",width=10,height=6)
 
 
 #ANCOVA LR
