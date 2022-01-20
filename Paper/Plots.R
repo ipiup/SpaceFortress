@@ -385,6 +385,28 @@ p_gameLevel
 ggsave(plot=p_gameLevel,"Paper\\FINAL\\GameLevelv2.pdf",device="pdf",width=10,height=6)
 
 
+#####
+#ANOVA Game Level/group, Age/group et Education/group
+
+#Age
+data_wide%>%
+  anova_test(Age~Group)
+
+
+#Education
+data_wide%>%
+  anova_test(NET~Group)
+
+#Game Level
+data_wide%>%
+  anova_test(GameLevel~Group)
+
+#mean by group
+data_wide%>%
+  group_by(Group)%>%
+  get_summary_stats(GameLevel,type="mean_sd")
+
+
 #PREPOST
 require(memoise)
 library(ggpattern)
@@ -552,7 +574,7 @@ figure_post
 ggsave(plot=figure_post,"Paper\\FINAL\\FigurePostGameLevel.pdf",device="pdf",width=14,height=6)
 
 
-
+#####
 ###Thèse Quentin APM and ScM
 library(ggExtra)
 df_APM=data.frame(Pseudo=rep(df_APM_ScM$Pseudo,each=540),Group=rep(df_APM_ScM$Group,each=540),Session=rep(df_APM_ScM$Session,each=540),ScM=unlist(df_APM_ScM$ScoresMin),APM=unlist(df_APM_ScM$APM))

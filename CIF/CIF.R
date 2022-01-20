@@ -65,7 +65,7 @@ x <- strsplit(as.character(data$Target), ";", fixed = T)
 data <- cbind(data[rep(1:nrow(data), lengths(x)), 1:2], content = unlist(x))
 data=data[,-2]
 colnames(data)=c("Source","Target")
-data[,2]=str_replace_all(data[,2]," ","") #remove whitespaces
+data[,2]=str_replace_all(data[,2]," ","") #remove white spaces
 
 
 for( DB in unique(data$Source)){
@@ -80,20 +80,6 @@ for( DB in unique(data$Source)){
       if(n>=c1 && n<=c2){
         data$Source[data$Target==x]=c
       }
-    }
-  }
-}
-data_D6=data[data$Source=="D6",]
-class_D6=unique(data_D6[grepl("-",data_D6[,2]),2])
-n_D6=unique(data_D6[nchar(data_D6[,2])==4,2])
-
-for(x in n_D6){
-  for(c in class_D6){
-    c1=parse_number(str_split(c,"-")[[1]][1])
-    c2=parse_number(str_split(c,"-")[[1]][2])
-    n=parse_number(x)
-    if(n>=c1 && n<=c2){
-      data_D6$Source[data_D6$Target==x]=c
     }
   }
 }
