@@ -47,25 +47,25 @@ grob_HD=grobTree(textGrob(eq_HD,x=0.77,y=0.095,hjust=0,gp=gpar(col="#A73030FF"))
 #grob_all=grobTree(textGrob(expression("y = "~alpha~"+"~beta~"*ln(x)"),x=0.1,y=0.85,hjust=0,gp=gpar(col="black")),gp=gpar(fontsize=15))
 
 plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()+
-  scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
+  scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Référence","Entraînement & stimulation","Court terme","Long terme")),breaks=1:11)+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.5))+
   #stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE,alpha=0.8,linetype="dashed")+
-  labs(x="Game Session",y="Total Score")+
+  labs(x="Session de Jeu",y="Score à Space Fortress")+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))+
-  scale_colour_manual(values=couleurs,labels=c("Sham","SD-tRNS","HD-tRNS"))+
-  scale_shape(labels=c("Sham","SD-tRNS","HD-tRNS"))+
+  scale_colour_manual(values=couleurs,labels=c("Groupe contrôle","Groupe stimulation bilatérale","Groupe stimulation unilatérale"))+
+  scale_shape(labels=c("Groupe contrôle","Groupe stimulation bilatérale","Groupe stimulation unilatérale"))+
   scale_y_continuous(breaks =seq(0, 15000, by = 2500))+
   #annotation_custom(grob_all)+
-  annotation_custom(grob_SHAM)+ annotation_custom(grob_SD)+ annotation_custom(grob_HD)+
-  theme(legend.position = c(0.69,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
+  #annotation_custom(grob_SHAM)+ annotation_custom(grob_SD)+ annotation_custom(grob_HD)+
+  theme(legend.position = c(0.815,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
         axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
-  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("Jour 1","Jour 2","Jour 3","Jour 4","Jour 5","Jour 15"),size=5)
 plot_LR
 
-ggsave(plot=plot_LR,"Paper\\FINAL\\RegressionByGroupV2.pdf",device="pdf",width=10,height=6)
+ggsave(plot=plot_LR,"Paper\\FINAL\\RegressionByGroup_FR.pdf",device="pdf",width=10,height=6)
 
 
 plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()+
@@ -587,6 +587,13 @@ ggplot(filter(df_APM,Session=="D14P2"), aes(x=ScM, y=APM) ) +
   annotate(geom="text",label="r = .7, p <.001",x=-500,y=300)+
   geom_smooth(method="lm",color="red",size=1)
   #stat_cor(method = "pearson")
+
+
+d=filter(df_APM,Session=="D14P2"|Session=="D01P1"|Group!="STIMSD")
+ggplot(d, aes(x=ScM, y=APM,shape=Session,color=Group))+
+  geom_point()+xlab("Score per Minute")+ylab("Action per Minute")+theme_pubr()
+
+
 
 ggplot(filter(df_APM,Session=="D14P2"),aes(x=ScM,y=APM))+
   geom_point()+theme_pubr()+stat_cor(method = "pearson")+geom_smooth(method="lm",color="red",size=2)
