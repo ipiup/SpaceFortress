@@ -40,7 +40,7 @@ mean_d$day=1:11
 p_APM=ggplot(mean_d,aes(day,m_APM,color=Group,shape=Group))+theme_pubr()+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Référence","Entraînement & stimulation","Court terme","Long terme")),breaks=1:11)+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
-  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
+  geom_vline(xintercepet_t = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.5))+
   labs(x="Session de Jeu",y="Appui par Minute")+
