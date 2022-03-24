@@ -12,6 +12,15 @@ date <- function(file_name){
     return(as.Date(substr(file_name, 34, 43), format="%Y-%m-%d"))
 }
 
+#' Date Hour
+#'
+#' @param file_name the file from which date and hour are extracted
+#' @param clean false if the data are raw and true if cleaned
+#'
+#' @return the date and hour when the game session was played
+#' @export
+#'
+#' @examples date_hour("SpaceFortress_AC2302_D02P2.txt" TRUE)
 date_hour<-function(file_name,clean=FALSE){
   if(clean==TRUE){
     return(as.POSIXct(str_sub(file_name,22,-8),format="%Y-%m-%d_%H-%M-%S"))

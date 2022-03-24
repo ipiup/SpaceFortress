@@ -23,7 +23,6 @@ if(b_Clean=="NO"){
 }else{
   #path_clean=choose.dir(default = "", caption = "Choose the Clean Data Folder")#Path For the Clean Data
   path_clean="E:\\ISAE-2021\\Alldata\\Data_clean\\"
-  
 }
 #CLEAN DATA READING
 fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
