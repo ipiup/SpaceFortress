@@ -6,7 +6,7 @@
 
 data_long = read.csv("E:\\SpaceFortress\\Paper\\CleanData\\data_long.csv") #here insert the data_long path
 data_wide = read.csv("E:\\SpaceFortress\\Paper\\CleanData\\data_wide.csv") #here insert the data_long path
-data_prepost=read.csv("E:\\ISAE-2021\\Alldata\\PREPOST.csv",sep=";") #here insert the data_prepost path
+data_prepost=read.csv("E:\\SpaceFortress\\Paper\\CleanData\\PREPOST.csv",sep=";") #here insert the data_prepost path
 #PARAMETERS
 
 couleurs=c("#868686FF","#0073C2FF","#A73030FF")
