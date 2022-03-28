@@ -33,7 +33,7 @@ library(patchwork)
 library(reshape2)
 library(ggsci)
 library(forcats)
-
+library(SciViews)
 #####
 #Figure 2
 #Learning Rate by groups
@@ -63,6 +63,7 @@ plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()
   theme(legend.position = c(0.7,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
         axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
   annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+plot_LR
 #ggsave(plot=plot_LR,"Figure2.pdf",device="pdf",width=10,height=6)
 
 #####
@@ -89,8 +90,8 @@ p_ancovaLR=ggplot(data_wide,aes(Group,LearningRateLT,color=Group,fill=Group,shap
   # label = "p = {round(p.adj,3)} {p.adj.signif}", inherit.aes = FALSE)+
   annotation_custom(grob_LR)+
   theme(axis.title=element_text(margin=0.1,size=18),text =element_text(size=16) )
+p_ancovaLR
 #ggsave(plot=p_ancovaLR,"Paper\\FINAL\\LearningRateAncova_small.pdf",device="pdf",width=7,height=6)
-
 
 #####
 #Figure 4
@@ -232,7 +233,6 @@ p_gameLevel=ggplot(data_wide,aes(Group,GameLevel,color=Group,fill=Group,shape=Gr
 #ggsave(plot=p_gameLevel,"Paper\\FINAL\\GameLevelv2.pdf",device="pdf",width=10,height=6)
 
 #Figure 7
-
 data_post_mean=data_prepost%>%
   group_by(Pseudo,Group,PrePost)%>%
   summarise(somme=mean(somme))
@@ -280,7 +280,6 @@ p_post=ggplot(data_post_mean,aes(Group,somme,color=Group,fill=Group,shape=Group)
 
 
 #Figure 8
-
 #Barplot likert
 m=melt(data_prepost)
 m=m%>%group_by(variable,value,Group,PrePost)%>%
