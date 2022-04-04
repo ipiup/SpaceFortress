@@ -62,39 +62,65 @@ data_long=merge(d,data_long,by=c("Session","Pseudo"))
 
 ###PLOTS
 
+data_long = data_long%>%
+  filter(Group!="STIMSD")
 #FORTRESS
 p_destroyed_fortress = ggplot(data_long,aes(Group,DestroyedFortress,color=Group))+theme_pubr()+
-  scale_colour_manual(values=couleurs)+facet_grid(~Session)+
+  scale_colour_manual(values=couleurs)+facet_grid(~Session)+scale_x_discrete(labels=c("SHAM" = "Sham", "STIMHD" = "HD"))+
   stat_summary(geom="point",fun="mean",size=2 ,position=position_dodge(width=0.5))+
-  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
-p_destroed_fortress
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
+p_destroyed_fortress
 
 #FLIGHT
 p_flight_bad_event = ggplot(data_long,aes(Group,FlightBadEvents,color=Group))+theme_pubr()+
-  scale_colour_manual(values=couleurs)+facet_grid(~Session)+
+  scale_colour_manual(values=couleurs)+facet_grid(~Session)+scale_x_discrete(labels=c("SHAM" = "Sham", "STIMHD" = "HD"))+
   stat_summary(geom="point",fun="mean",size=2 ,position=position_dodge(width=0.5))+
-  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
 p_flight_bad_event
 
 #BONUS
 library(tidyr)
 d_bonus=data_long%>%
-  select(Session,Pseudo,ShotBonus,PointBonus,Group)%>%
+  select(Session,Pseudo,ShotBonus,PointBonus,FailedBonus,Group)%>%
   filter(Session=="D01P1"|Session == "D05P2"|Session=="D14P2")%>%
-  pivot_longer(cols=c("ShotBonus","PointBonus"),names_to = "Bonus",values_to = "Nb_Bonus")
+  pivot_longer(cols=c("ShotBonus","PointBonus","FailedBonus"),names_to = "Bonus",values_to = "Nb_Bonus")
 d_bonus%>%
   group_by(Bonus,Session)%>%
   summarise(mean=mean(Nb_Bonus))
 
 p_shot_points_bonus = ggplot(d_bonus,aes(Group,Nb_Bonus,fill=Bonus))+theme_pubr()+
   geom_bar(stat="identity",position = position_dodge())+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=1))+
+  stat_summary(geom="point",fun="mean",size=2 ,position=position_dodge(width=1))+
   scale_fill_manual(values=couleurs)+facet_grid(~Session)
 p_shot_points_bonus
 
+p_bonus = ggplot(d_bonus,aes(Group,Nb_Bonus,color=Bonus))+theme_pubr()+
+scale_color_manual(values=couleurs)+facet_grid(~Session)+scale_x_discrete(labels=c("SHAM" = "Sham", "STIMHD" = "HD"))+
+stat_summary(geom="point",fun="mean",size=2 ,position=position_dodge(width=0.5))+
+stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
+
+
+
+
 #MINES
 p_time_destroying_mines = ggplot(filter(data_long,grepl("P2",Session)|Session=="D01P1"),aes(Group,TimeDestroyingMines,color= Group))+theme_pubr()+
-  scale_colour_manual(values=couleurs)+facet_grid(~Session)+scale_x_discrete(labels=c("SHAM" = "Sham", "STIMSD" = "SD", "STIMHD" = "HD"))+
+  scale_colour_manual(values=couleurs)+facet_grid(~Session)+scale_x_discrete(labels=c("SHAM" = "Sham", "STIMHD" = "HD"))+
   stat_summary(geom="point",fun="mean",size=2 ,position=position_dodge(width=0.5))+
-  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))
 
 p_time_destroying_mines
+
+ 
+t.test(TimeDestroyingMines ~ Group, data = filter(data_long,Session=="D01P1"|Session == "D14P2"))
+anova_D1_D13_mines = aov(TimeDestroyingMines~Group + Session, data =data_long)
+summary(anova_D1_D13_mines)
+
+
+
+d_subscores = data_long%>%
+  select(Pseudo,Session,Group,DestroyedFortress,FlightBadEvents,TimeDestroyingMines,ShotBonus,PointBonus,FailedBonus,TotalScore)%>%
+  arrange(Pseudo)
+  
+
+write.csv2(d_subscores,"SuppSousScores.csv",row.names = FALSE)
