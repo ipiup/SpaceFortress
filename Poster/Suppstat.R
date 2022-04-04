@@ -80,11 +80,14 @@ p_flight_bad_event
 library(tidyr)
 d_bonus=data_long%>%
   select(Session,Pseudo,ShotBonus,PointBonus,Group)%>%
-  filter(Session=="D01P1"|Session=="D14P2")%>%
+  filter(Session=="D01P1"|Session == "D05P2"|Session=="D14P2")%>%
   pivot_longer(cols=c("ShotBonus","PointBonus"),names_to = "Bonus",values_to = "Nb_Bonus")
+d_bonus%>%
+  group_by(Bonus,Session)%>%
+  summarise(mean=mean(Nb_Bonus))
 
 p_shot_points_bonus = ggplot(d_bonus,aes(Group,Nb_Bonus,fill=Bonus))+theme_pubr()+
-  geom_bar(stat="identity")+
+  geom_bar(stat="identity",position = position_dodge())+
   scale_fill_manual(values=couleurs)+facet_grid(~Session)
 p_shot_points_bonus
 
