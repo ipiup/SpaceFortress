@@ -307,30 +307,36 @@ plot_Fortress=ggplot(data_long,aes(D,Fortress,color=Group,group=Group))+theme_pu
 ggarrange(plot_Flight,plot_Bonus,plot_Mine,plot_Fortress,ncol=2,nrow=2,common.legend = TRUE)
 
 
-plot_Flight=ggplot(data_long,aes(D,Flight,color=Group,group=Group))+theme_pubr()+
+plot_Flight=ggplot(filter(data_long,!grepl("P1",Session)&Group!="STIMSD"),aes(D,Flight,color=Group,group=Group))+theme_pubr()+
   geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+
   stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+
   scale_color_manual(values=couleurs)+geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+
   geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+xlab("Sessions")+
-  scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
-plot_Bonus=ggplot(data_long,aes(D,Bonus,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)
+  #stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
+plot_Flight
+plot_Bonus=ggplot(filter(data_long,!grepl("P1",Session)&Group!="STIMSD"),aes(D,Bonus,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+scale_color_manual(values=couleurs)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  xlab("Session")+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
-plot_Mine=ggplot(data_long,aes(D,Mine,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  xlab("Session")#+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
+plot_Mine=ggplot(filter(data_long,!grepl("P1",Session)&Group!="STIMSD"),aes(D,Mine,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+scale_color_manual(values=couleurs)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  xlab("Session")+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
-plot_Fortress=ggplot(data_long,aes(D,Fortress,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  xlab("Session")#+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
+plot_Fortress=ggplot(filter(data_long,!grepl("P1",Session)&Group!="STIMSD"),aes(D,Fortress,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+scale_color_manual(values=couleurs)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
-  xlab("Session")+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
+  xlab("Session")#+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
 ggarrange(plot_Flight,plot_Bonus,plot_Mine,plot_Fortress,ncol=2,nrow=2,common.legend = TRUE)
+#plot_Bonus=ggplot(filter(data_long,Group!="STIMSD"),aes(D,Bonus,color=Group,group=Group))+theme_pubr()+geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+ # stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.3))+stat_summary(geom="line" ,position=position_dodge(width=0.3),fun="mean" ,show.legend = FALSE)+scale_color_manual(values=couleurs)+
+ # geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
+ # scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
+ # xlab("Session")#+stat_summary(fun.data = "mean_se",geom="errorbar",width=0.2, fun.args = list(mult = 1) ,position=position_dodge(width=0.3))
 
 
 #Delta Frotress

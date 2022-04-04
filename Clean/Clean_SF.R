@@ -357,6 +357,7 @@ read_final_Score<-function(files_data,path_clean=path_clean,detailed=FALSE){
   return(df_data)
 }
 
+
 demographie<-function(final_df,df_demographique,ZMean,Delta){
   df_demographique$D01P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D01P1"]}))
   df_demographique$D02P1=as.numeric(lapply(df_demographique$identifiant,function(x){final_df$TotalScore[final_df$Pseudo==x&final_df$Session=="D02P1"]}))

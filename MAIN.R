@@ -26,7 +26,13 @@ if(b_Clean=="NO"){
 }
 #CLEAN DATA READING
 fil_clean=list.files(path=path_clean,recursive = T) #load the clean files
-data=read_final_Score(fil_clean,path_clean,detailed = FALSE) #Create the data 
+#data=read_final_Score(fil_clean,path_clean,detailed = FALSE) #Create the data 
+data=read_final_Score(fil_clean,path_clean,detailed = TRUE) #Create the data 
+
+#####
+#POSTER STUDY
+
+
 #df_GROUPS=read.table(choose.files(default = "", caption = "Select the GROUP.txt file"),header=TRUE)#Choose the Group txt file
 df_GROUPS=read.table("E:\\ISAE-2021\\Alldata\\GROUPS.txt",header=TRUE)
 for(str_pseudo in unique(data$Pseudo)){
@@ -58,7 +64,7 @@ data_long=subset(data_long,Pseudo!="CP1809"&Pseudo!="MM0301"&Pseudo!="SP0801"&Ps
 #####
 #LearningRate
 data_wide=LearningRate(data_long,data_wide,ZM=FALSE)
-data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
+#data_wide=LearningRate(data_long,data_wide,TRUE,ZM=FALSE)
 #data_wide=LearningRate(data_long,data_wide,ZM=TRUE)
 #data_wide=LearningRate(data_long,data_wide,TRUE,ZM=TRUE)
 #SubScoreLearningRate
