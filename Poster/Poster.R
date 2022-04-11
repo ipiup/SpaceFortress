@@ -409,3 +409,97 @@ plot_APM=ggplot(filter(data_long,!grepl("P1",Session)&Group!="STIMSD"),aes(D,APM
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Baseline","Training","Short-term","Long-term")),breaks=1:11)+
   xlab("Session")
 plot_APM
+
+
+#####
+#FIGURE
+couleurs_poster = c("#0073C2FF","#A73030FF")
+data_long=subset(data_long,Group!="STIMSD")%>%arrange(Pseudo)
+data_long$D=1:11
+data_long$Pseudo=factor(data_long$Pseudo)
+data_long$Session = factor(data_long$Session)
+#LR 
+#Learning Rate by groups
+fit_SHAM=lm(TotalScore~ln(D),data=filter(data_long,Group=="SHAM"))
+fit_HD=lm(TotalScore~ln(D),data=filter(data_long,Group=="STIMHD"))
+
+eq_SHAM=paste0("y= ",round(coef(fit_SHAM)[1])," + ",round(coef(fit_SHAM)[2]),"*ln(x)     ")
+eq_HD=paste0("y= ",round(coef(fit_HD)[1])," + ",round(coef(fit_HD)[2]),"*ln(x)")
+grob_SHAM=grobTree(textGrob(eq_SHAM,x=0.77,y=0.17,hjust=0,gp=gpar(col="#0073C2FF")),gp=gpar(fontsize=15))
+grob_HD=grobTree(textGrob(eq_HD,x=0.77,y=0.12,hjust=0,gp=gpar(col="#A73030FF")),gp=gpar(fontsize=15))
+
+plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()+
+  scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Reference","Training & Stimulation","Short-term","Long-term")),breaks=1:11)+
+  geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
+  stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
+  stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.5))+
+  labs(x="Game Session",y="Total Score")+
+  stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))+
+  scale_y_continuous(breaks =seq(0, 15000, by = 2500))+
+  scale_colour_manual(values=couleurs_poster,labels=c("Sham","Stim"))+scale_shape(labels=c("Sham","Stim"))+
+  annotation_custom(grob_SHAM)+annotation_custom(grob_HD)+
+  theme(legend.position = c(0.7,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
+        axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
+  annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
+plot_LR
+
+
+p_Fortress = ggplot(filter(data_long,Session=="D01P1"|Session=="D05P2"|Session=="D14P2"),aes(Session,DestroyedFortress,color=Group,group=Group))+theme_pubr()+
+  geom_point(alpha=0.4,position=position_jitterdodge(jitter.width = 0.2,dodge.width = 0.3))+
+  stat_summary(geom="point",fun="mean",size=3,position = position_dodge(width=0.3))+
+  stat_summary(geom="line",fun="mean",show.legend = FALSE,position = position_dodge(width=0.3))+
+  scale_colour_manual(values=couleurs_poster,labels = c("Sham","Stim"))+
+  labs(title = "Mean Destroyed Fortress per Session", y ="Destroyed Fortress" ,x="")+
+  geom_rect(data=data_long,aes(xmin=1.2,xmax=1.8,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  geom_vline(xintercept = c(1.2,1.8),linetype="dotted",alpha=0.5)+
+  theme(legend.position = c(0.9,0.2),plot.title = element_text(hjust=0.5))+
+  annotate("text",x=1.5,y=5,label="Training")
+p_Fortress
+
+p_Flight = ggplot(filter(data_long,Session=="D01P1"|Session=="D05P2"|Session=="D14P2"),aes(Session,FlightBadEvents,color=Group,group=Group))+theme_pubr()+
+  geom_point(alpha=0.4,position=position_jitterdodge(jitter.width = 0.2,dodge.width = 0.3))+
+  stat_summary(geom="point",fun="mean",size=3,position = position_dodge(width=0.3))+
+  stat_summary(geom="line",fun="mean",show.legend = FALSE,position = position_dodge(width=0.3))+
+  scale_colour_manual(values=couleurs_poster,labels = c("Sham","Stim"))+
+  labs(title = "Mean Bad Flight Events per Session", y ="Bad Flight Events" ,x="")+
+  geom_rect(data=data_long,aes(xmin=1.2,xmax=1.8,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  geom_vline(xintercept = c(1.2,1.8),linetype="dotted",alpha=0.5)+
+  theme(legend.position = c(0.9,0.2),plot.title = element_text(hjust=0.5))+
+  annotate("text",x=1.5,y=95,label="Training")+
+  scale_y_reverse(limits = c(100, 0))
+p_Flight
+
+p_Mine = ggplot(filter(data_long,Session=="D01P1"|Session=="D05P2"|Session=="D14P2"),aes(Session,Mine_Prct,color=Group,group=Group))+theme_pubr()+
+  geom_point(alpha=0.4,position=position_jitterdodge(jitter.width = 0.2,dodge.width = 0.3))+
+  stat_summary(geom="point",fun="mean",size=3,position = position_dodge(width=0.3))+
+  stat_summary(geom="line",fun="mean",show.legend = FALSE,position = position_dodge(width=0.3))+
+  scale_colour_manual(values=couleurs_poster,labels = c("Sham","Stim"))+
+  labs(title = "Mean Mine Percentage Destruction per Session", y ="Mine Percentage Destruction" ,x="")+
+  geom_rect(data=data_long,aes(xmin=1.2,xmax=1.8,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  geom_vline(xintercept = c(1.2,1.8),linetype="dotted",alpha=0.5)+
+  ylim(0,100)+theme(legend.position = c(0.9,0.2),plot.title = element_text(hjust=0.5))+
+  annotate("text",x=1.5,y=5,label="Training")
+p_Mine
+
+p_Bonus = ggplot(filter(data_long,Session=="D01P1"|Session=="D05P2"|Session=="D14P2"),aes(Session,Bonus_Prct,color=Group,group=Group))+theme_pubr()+
+  geom_point(alpha=0.4,position=position_jitterdodge(jitter.width = 0.2,dodge.width = 0.3))+
+  stat_summary(geom="point",fun="mean",size=3,position = position_dodge(width=0.3))+
+  stat_summary(geom="line",fun="mean",show.legend = FALSE,position = position_dodge(width=0.3))+
+  scale_colour_manual(values=couleurs_poster,labels = c("Sham","Stim"))+
+  labs(title = "Mean Bonus Percentage Destruction per Session", y ="Bonus Percentage" ,x="")+
+  geom_rect(data=data_long,aes(xmin=1.2,xmax=1.8,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  ylim(0,100)+theme(legend.position = c(0.9,0.2),plot.title = element_text(hjust=0.5))+
+  annotate("text",x=1.5,y=5,label="Training")
+p_Bonus
+
+ggarrange(p_Fortress,p_Flight,p_Mine,p_Bonus,ncol=2,nrow=2,common.legend = TRUE)
+
+
+library(patchwork)
+
+figure=(plot_spacer() + p_Flight + plot_spacer() + plot_layout(widths = c(1,2,1)))/( p_Bonus|p_Mine)/(p_Flight|p_Fortress) +
+  plot_annotation(tag_levels = "a")&theme(plot.tag.position = c(0.01,0.95),plot.tag = element_text(size=12,face = 'bold'))
+figure
+
+#####

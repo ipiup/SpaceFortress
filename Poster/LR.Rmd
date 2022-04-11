@@ -1,10 +1,10 @@
 ---
 title: "Learning Rates on Total and Sub Scores for HD and SHAM groups"
+geometry: margin=1cm
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-geometry: margin=1cm
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +22,7 @@ library(ggpubr)
 library(grid)
 library(rstatix)
 library(gghalves)
-
+library(kableExtra)
 ```
 ```{r param, include = FALSE}
 couleurs_poster = c("#0073C2FF","#A73030FF")
@@ -320,16 +320,51 @@ ancova_total_LT = data_wide%>%
   anova_test(DeltaD1D14~Group+GameLevelLog)
 ancova_total_ST = data_wide%>%
   anova_test(DeltaD1D5~Group+GameLevelLog)
-ancova_totat_RT =data_wide%>%
+ancova_total_RT =data_wide%>%
   anova_test(DeltaD14D5~Group+GameLevelLog)
 #Fortress
 ancova_fortress_LT = data_wide%>%
   anova_test(DeltaD1D14Fortress~Group+GameLevelLog)
 ancova_fortress_ST = data_wide%>%
   anova_test(DeltaD5D1Fortress~Group+GameLevelLog)
-ancova_fortress_RT =data_wide%>%
+ancova_fortress_RT = data_wide%>%
   anova_test(DeltaD14D5Fortress~Group+GameLevelLog)
 #Flight
-ancova_flight_LT = data_
-
+ancova_flight_LT = data_wide%>%
+  anova_test(DeltaD1D14Flight~Group+GameLevelLog)
+ancova_flight_ST = data_wide%>%
+  anova_test(DeltaD5D1Flight~Group+GameLevelLog)
+ancova_flight_RT = data_wide%>%
+  anova_test(DeltaD14D5Flight~Group+GameLevelLog)
+#Bonus
+ancova_bonus_LT = data_wide%>%
+  anova_test(DeltaD1D14Bonus~Group+GameLevelLog)
+ancova_bonus_ST = data_wide%>%
+  anova_test(DeltaD5D1Bonus~Group+GameLevelLog)
+ancova_bonus_RT = data_wide%>%
+  anova_test(DeltaD14D5Bonus~Group+GameLevelLog)
+#Mine
+ancova_mine_LT = data_wide%>%
+  anova_test(DeltaD1D14Mine~Group+GameLevelLog)
+ancova_mine_ST = data_wide%>%
+  anova_test(DeltaD5D1Mine~Group+GameLevelLog)
+ancova_mine_RT = data_wide%>%
+  anova_test(DeltaD14D5Mine~Group+GameLevelLog)
+```
+```{r delta_table , echo = FALSE}
+delta_table= data.frame(Delta= c(rep("ST", 2), rep("LT", 2),rep("RT",2)),
+                               Effect = c("Group","Game","Group","Game","Group","Game"),
+                TotalScore  = c(ancova_total_ST$p[1],ancova_total_ST$p[2],ancova_total_LT$p[1],
+                           ancova_total_LT$p[2],ancova_total_RT$p[1],ancova_total_RT$p[2]),
+                Fortress = c(ancova_fortress_ST$p[1],ancova_fortress_ST$p[2],ancova_fortress_LT$p[1],
+                           ancova_fortress_LT$p[2],ancova_fortress_RT$p[1],ancova_fortress_RT$p[2]),
+                Flight = c(ancova_flight_ST$p[1],ancova_flight_ST$p[2],ancova_flight_LT$p[1],
+                           ancova_flight_LT$p[2],ancova_flight_RT$p[1],ancova_flight_RT$p[2]),
+                Bonus = c(ancova_bonus_ST$p[1],ancova_bonus_ST$p[2],ancova_bonus_LT$p[1],
+                           ancova_bonus_LT$p[2],ancova_bonus_RT$p[1],ancova_bonus_RT$p[2]),
+                Mine = c(ancova_mine_ST$p[1],ancova_mine_ST$p[2],ancova_mine_LT$p[1],
+                           ancova_mine_LT$p[2],ancova_mine_RT$p[1],ancova_mine_RT$p[2]))
+delta_table%>%
+  kable("latex")%>% 
+  collapse_rows(columns = 1)
 ```
