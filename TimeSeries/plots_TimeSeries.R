@@ -227,12 +227,12 @@ violin_plot
 
 
 #####Septembre 2021
-#Plots thÃ¨se quentin participant ME1310 D1 & D5
+#Plots thèse quentin participant ME1310 D1 & D5
 
-df_1=read.table("E:/ISAE-2021/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_GF0912_D02P2.txt",sep="\t")
+df_1=read.table("E:/ISAE-Autre/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_GF0912_D02P2.txt",sep="\t")
 df_1$T=c(1:540)
 
-df=read.table("E:/ISAE-2021/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_JM1704_D02P2.txt",sep="\t")
+df=read.table("E:/ISAE-Autre/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_JM1704_D02P2.txt",sep="\t")
 df$T=c(1:540)
 
 
@@ -243,6 +243,7 @@ p=ggplot()+theme_pubr()+scale_x_continuous(breaks=seq(0,540,by=60))+
   geom_smooth(data=df,aes(T,ScoresMin),method="loess",span=0.1,level=0.95,color="blue")+
   geom_line(data=df_1,aes(T,ScoresMin),color="red")+
   geom_smooth(data=df_1,aes(T,ScoresMin),method="loess",span=0.1,level=0.95,color="red")
+
 p+annotate("text",x=500,y=-500,label="Participant 1",color="red")+
   annotate("text",x=500,y=-600,label="Participant 2",color="blue")
 
@@ -265,4 +266,29 @@ p_APM=ggplot(df,aes(T,APM))+theme_pubr()+geom_line()+scale_x_continuous(breaks=s
 
 ggarrange(p_Scm,p_APM,nrow=2)
 
+#### Février 2023
+# Demande ANR Quentin MPH
+df_1=read.table("E:/ISAE-Autre/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_GF0912_D02P2.txt",sep="\t")
+df_1$T=c(1:540)
 
+df=read.table("E:/ISAE-Autre/Alldata/ScM/ScM_APM/ScM_APM_SpaceFortress_JM1704_D02P2.txt",sep="\t")
+df$T=c(1:540)
+
+
+
+df_merge = rbind(df_1,df)
+df_merge$Zscore = scale(df_merge$ScoresMin)
+dfZ_1 = df_merge[1:540,]
+dfZ = df_merge[541:1080,]
+
+p_Zscore= ggplot()+theme_pubr()+scale_x_continuous(breaks=seq(0,540,by=60))+
+  ylab("Z-Score (Score par Minute)")+xlab("Time (s)")+
+  geom_line(data=dfZ,aes(T,Zscore),color="blue")+
+  geom_smooth(data=dfZ,aes(T,Zscore),method="loess",span=0.1,level=0.95,color="blue")+
+  geom_line(data=dfZ_1,aes(T,Zscore),color="red")+
+  geom_smooth(data=dfZ_1,aes(T,Zscore),method="loess",span=0.1,level=0.95,color="red")
+
+p_Zscore = p_Zscore+annotate("text",x=500,y=-3,label="Participant 1",color="red")+
+  annotate("text",x=500,y=-3.4,label="Participant 2",color="blue") + geom_hline(yintercept=c(-2,2), linetype="dashed", color = "grey")
+
+ggsave('E:\\SpaceFortress\\TimeSeries\\ZscoreMin.png', plot = p_Zscore, width = 15,height=5, dpi = 600)

@@ -659,7 +659,7 @@ p_sham=ggplot() +theme_pubr()+
   theme(axis.line.x=element_blank(),axis.text.x = element_blank(),axis.title = element_blank(),axis.ticks = element_blank())+
   geom_hline(yintercept = 0)+
   geom_segment(aes(x=c(1,9),xend=c(1,9),y=-1.1,yend=1.1),linetype="dashed")+
-  scale_y_continuous(breaks=c(-1,0,1),labels=c("-","0","+"),limits=c(-1.1,1.3))
+  scale_y_continuous(breaks=c(-1,0,1),labels=c("-","0","+"),limits=c(-1.1,1.3))+theme_transparent()
 
 p_sham_anodal=p_sham+sham_anodal+annotate("text",label="Sham (Anodal tDCS)",x=5,y=1.3)
 p_sham_anodal
@@ -673,7 +673,7 @@ p_tDCS_anodal=ggplot() +theme_pubr()+
   annotate("text",label="Anodal tDCS",x=5,y=1.3)+
   scale_y_continuous(breaks=c(-1,0,1),labels=c("-","0","+"),limits=c(-1.1,1.3))+
   geom_segment(aes(x=c(1,9),xend=c(1,9),y=-1.1,yend=1.1),linetype="dashed")+
-  geom_line(aes(x,y_tDCS_anodal),size=0.5)
+  geom_line(aes(x,y_tDCS_anodal),size=0.5)+theme_transparent()
  
 y_tDCS_cathodal=c(-1*x[1:100],rep(-1,length(x)-200),1*x[(length(x)-99):length(x)]-10)
 p_tDCS_cathodal=ggplot() +theme_pubr()+
@@ -699,7 +699,7 @@ p_tACS=ggplot() +theme_pubr()+
   annotate("text",label="tACS",x=5,y=1.3)+
   scale_y_continuous(breaks=c(-1,0,1),labels=c("-","0","+"),limits=c(-1.1,1.3))+
   geom_segment(aes(x=c(1,9),xend=c(1,9),y=-1.1,yend=1.1),linetype="dashed")+
-  geom_line(aes(x,y_tACS),size=0.5)
+  geom_line(aes(x,y_tACS),size=0.5)+theme_transparent()
 
 p_sham_tACS=p_sham+sham_tACS+annotate("text",label="Sham (tACS)",x=5,y=1.3)
 p_sham_tACS
@@ -721,9 +721,9 @@ p_tRNS=ggplot() +theme_pubr()+
   theme(axis.line.x=element_blank(),axis.text.x = element_blank(),axis.title = element_blank(),axis.ticks = element_blank())+
   annotate("text",label="tRNS",x=500,y=1.3)+
   geom_hline(yintercept = 0)+
-  scale_y_continuous(breaks=c(-1,0,1),labels=c("-","0","+"),limits=c(-1.1,1.3))+
+  scale_y_continuous(breaks=c(-1,0,1),labels=c("-1","0","1"),limits=c(-1.1,1.3))+
   geom_segment(aes(x=c(100,900),xend=c(100,900),y=-1.1,yend=1.1),linetype="dashed")+
-  geom_line(aes(x_tRNS,y_tRNS),size=0.5)
+  geom_line(aes(x_tRNS,y_tRNS),size=0.5)+theme_transparent()
 
 p_sham_tRNS=ggplot() +theme_pubr()+
   theme(axis.line.x=element_blank(),axis.text.x = element_blank(),axis.title = element_blank(),axis.ticks = element_blank())+
@@ -731,13 +731,20 @@ p_sham_tRNS=ggplot() +theme_pubr()+
   geom_segment(aes(x=c(100,900),xend=c(100,900),y=-1.1,yend=1.1),linetype="dashed")+
   annotate("text",label="Sham (tRNS)",x=500,y=1.3)+
   scale_y_continuous(breaks=c(-1,0,1),labels=c("-","0","+"),limits=c(-1.1,1.3))+sham_tRNS
+  
 p_sham_tRNS
 
 ggarrange(p_tDCS_anodal,p_sham_anodal,p_tDCS_cathodal,p_sham_cathodal,
           p_tACS,p_sham_tACS,p_tRNS,
           p_sham_tRNS,nrow=4,ncol=2,align="hv")
 
+p_stims = ggarrange(p_tDCS_anodal,p_tDCS_cathodal,
+          p_tACS,p_tRNS,nrow=4,ncol=1,align="hv")+ theme_transparent()
 
+ggsave(p_tRNS,filename="E:\\SpaceFortress\\Poster\\POSTER\\p_tRNS_transparent.png",bg = "transparent",width=5,height=6)
+ggsave(p_tACS,filename="E:\\SpaceFortress\\Poster\\POSTER\\p_tACS_transparent.png",bg = "transparent",width=5,height=6)
+ggsave(p_tDCS_anodal,filename="E:\\SpaceFortress\\Poster\\POSTER\\p_tDCSa_transparent.png",bg = "transparent",width=5,height=6)
+ggsave(p_tDCS_cathodal,filename="E:\\SpaceFortress\\Poster\\POSTER\\p_tDCSc_transparent.png",bg = "transparent",width=5,height=6)
 
 #tRNS percentage HD-montage
 #tRNS
@@ -754,8 +761,8 @@ up=seq(0,0.99,by=0.01)*rtruncnorm(n=100, a=-1, b=1, mean=0, sd=0.33)
 down=seq(0.99,0,by=-0.01)*rtruncnorm(n=100, a=-1, b=1, mean=0, sd=0.33)
 y_tRNS =c(up,rtruncnorm(n=801, a=-1, b=1, mean=0, sd=0.33),down)
 p_tRNS=ggplot() +theme_pubr()+
-  theme(axis.line.x=element_blank(),axis.text.x = element_blank(),axis.title = element_blank(),axis.ticks = element_blank())+
-  annotate("text",label="tRNS",x=500,y=1.3)+
+  theme(axis.line.x=element_blank(),axis.text.x = element_blank(),axis.title = element_blank(),axis.ticks = element_blank(),text = element_text(size = 30))+
+  annotate("text",label="tRNS",x=500,y=1.3,size=10)+
   geom_hline(yintercept = 0)+
   scale_y_continuous(breaks=c(-1,0,1),labels=c("-1","0","1"),limits=c(-1.1,1.3))+
   geom_segment(aes(x=c(100,900),xend=c(100,900),y=-1.1,yend=1.1),linetype="dashed")+
@@ -783,8 +790,7 @@ p_tRNS=p_tRNS+theme(legend.background = element_rect(fill = "transparent"),
                           panel.background = element_rect(fill = "transparent"),
                           panel.grid.major = element_blank(),
                           panel.grid.minor = element_blank(),
-                          plot.background = element_rect(fill = "transparent", color = NA))+
-                          coord_cartesian(xlim=c(200,400))
+                          plot.background = element_rect(fill = "transparent", color = NA))
 p_tRNS_27=p_tRNS_27+theme(legend.background = element_rect(fill = "transparent"),
                           legend.box.background = element_rect(fill = "transparent"),
                           panel.background = element_rect(fill = "transparent"),
@@ -804,3 +810,5 @@ p_tRNS_23
 ggsave(p_tRNS,filename="p_tRNS_transparent.png",bg = "transparent",width=6,height=3)
 ggsave(p_tRNS_27,filename="p_tRNS27_transparent.png",bg = "transparent",width=6,height=3)
 ggsave(p_tRNS_23,filename="p_tRNS23_transparent.png",bg = "transparent",width=6,height=3)
+
+ggsave(p_tRNS,filename = "E:\\SpaceFortress\\Poster\\POSTER\\HighDef\\tRNS_highdef.png",bg="transparent", width = 8, height = 4, device='png', dpi=700)

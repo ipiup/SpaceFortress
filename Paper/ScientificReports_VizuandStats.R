@@ -36,6 +36,13 @@ library(forcats)
 library(SciViews)
 #####
 #Figure 2
+
+#AKAIKE CRITERION
+fit_ln=lm(TotalScore~ln(D),data=data_long) #fit_all_lin=lm(TotalScore~D,data=data_long)
+fit_lin=lm(TotalScore~D,data=data_long)
+AIC(fit_ln)
+AIC(fit_lin)
+
 #Learning Rate by groups
 fit_SHAM=lm(TotalScore~ln(D),data=filter(data_long,Group=="SHAM"))
 fit_SD=lm(TotalScore~ln(D),data=filter(data_long,Group=="STIMSD"))
@@ -64,7 +71,7 @@ plot_LR=ggplot(data_long,aes(D,TotalScore,color=Group,shape=Group))+theme_pubr()
         axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
   annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("D1","D2","D3","D4","D5","D15"),size=5)
 plot_LR
-#ggsave(plot=plot_LR,"Figure2.pdf",device="pdf",width=10,height=6)
+#ggsave(plot=plot_LR,"TotalScoreLearningRate.pdf",device="pdf",width=10,height=6)
 
 #####
 #Figure 3

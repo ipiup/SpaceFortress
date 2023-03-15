@@ -1,75 +1,115 @@
 library(ggExtra)
+library(rstatix)
+library(gghalves)
+#APMSCM
+#####
 
-df_APM=data.frame(Pseudo=rep(df_APM_ScM$Pseudo,each=540),GameLevel=rep(df_APM_ScM$GameLevel,each=540),Group=rep(df_APM_ScM$Group,each=540),Session=rep(df_APM_ScM$Session,each=540),ScM=unlist(df_APM_ScM$ScoresMin),APM=unlist(df_APM_ScM$APM))
-df_APM=data.frame(Pseudo=rep(df_APM_ScM$Pseudo,each=540),Group=rep(df_APM_ScM$Group,each=540),Session=rep(df_APM_ScM$Session,each=540),ScM=unlist(df_APM_ScM$ScoresMin),APM=unlist(df_APM_ScM$APM))
+data_APM_ScM = read.csv("E:\\SpaceFortress\\Poster\\Data\\data_APM_SCM_HD_SHAM.csv")
 
-df_APM$Group=factor(df_APM$Group,levels=c("SHAM","STIMSD","STIMHD"))
 
-ggplot(filter(df_APM,Session=="D14P2"), aes(x=ScM, y=APM) ) +
-  geom_bin2d(bins=150)+scale_fill_gradient(low="lightgrey",high="black")+
-  theme_pubr()+xlab("Score per Minute")+ylab("Action per Minute")+
-  annotate(geom="text",label="r = .7, p <.001",x=-500,y=300)+
-  geom_smooth(method="lm",color="red",size=1)
-#stat_cor(method = "pearson")
+#STATS on APM and SCM
+#D1
+d1_sham=filter(data_APM_ScM,Session=="D01P1"&Group=="SHAM")%>%
+  group_by(Pseudo)%>%
+  summarise(meanScm=mean(ScM),meanAPM=mean(APM))
+d1_hd=filter(data_APM_ScM,Session=="D01P1"&Group=="STIMHD")%>%
+  group_by(Pseudo)%>%
+  summarise(meanScm=mean(ScM),meanAPM=mean(APM))
+#TTEST
+t.test(d1_sham$meanAPM,d5_hd$meanAPM)
+t.test(d1_hd$meanScm,d5_hd$meanScm)
+#D5
+d5_sham=filter(data_APM_ScM,Session=="D05P2"&Group=="SHAM")%>%
+  group_by(Pseudo)%>%
+  summarise(meanScm=mean(ScM),meanAPM=mean(APM))
+d5_hd=filter(data_APM_ScM,Session=="D05P2"&Group=="STIMHD")%>%
+  group_by(Pseudo)%>%
+  summarise(meanScm=mean(ScM),meanAPM=mean(APM))
+#TTEST
+t.test(d5_sham$meanAPM,d5_hd$meanAPM)
+t.test(d5_sham$meanScm,d5_hd$meanScm)
 
+
+
+
+##FIGURES
 #figure1
-d=filter(df_APM,Session=="D01P1"|Session=="D14P2")
-d=filter(d,Group!="STIMSD")
-
-d$G = paste(d$Session,d$Group)
-#ggplot(d, aes(x=ScM, y=APM,color=G))+
- # geom_point(alpha=0.2)+xlab("Score per Minute")+ylab("Action per Minute")+theme_pubr()
-
-
-mean_d=d%>%
+d5_d14=filter(data_APM_ScM,Session=="D01P1"|Session=="D05P2"|Session=="D14P2")
+d5_d14$G = paste(d5_d14$Session,d5_d14$Group)
+mean_d5_d14=d5_d14%>%
   group_by(Pseudo,Group,Session)%>%
   summarise(m_APM=mean(APM),m_ScM=mean(ScM))
-ggplot(mean_d,aes(m_ScM,m_APM,color=Group,shape=Group))+geom_point(size=2)+
-  xlab("Score per Minute")+ylab("Action per Minute")+theme_pubr()+facet_grid(~Session)+stat_smooth(method=lm)
 
+p_D1=ggplot(filter(mean_d5_d14,Session=="D01P1"),aes(m_ScM,m_APM,color=Group))+geom_point(size=2,position=position_dodge(width=0.5))+
+  xlab("Score per Minute")+ylab("Action per Minute")+theme_pubr()+
+  stat_smooth(method=lm)
+p_D1
 
-mean_d_=df_APM%>%
+mean_all_days=data_APM_ScM%>%
   group_by(Group,Session)%>%
   summarise(m_APM=mean(APM),m_ScM=mean(ScM))
-ggplot(mean_d_,aes(Session,m_ScM, color=Group,group=Group))+geom_point(size=2)+
+ggplot(mean_all_days,aes(Session,m_ScM, color=Group,group=Group))+geom_point(size=2)+
   xlab("Session")+ylab("Score per Minute")+theme_pubr()+stat_smooth(method=lm)
 
-ggplot(mean_d_,aes(Session,m_APM, color=Group,group=Group))+geom_point(size=2)+
-  xlab("Session")+ylab("Action per Minute")+theme_pubr()+stat_smooth(method=lm)
+ggplot(mean_d5_d14,aes(Session,m_ScM,color=Group,fill=Group))+theme_pubr()+
+  geom_half_violin()+geom_half_point(show.legend = F)+
+  stat_summary(aes(Session,m_ScM),fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1,position = position_dodge(width=0.3))+
+  stat_summary(geom="point",fun="mean",size=2,position = position_dodge(width=0.3),color="black",show.legend = F)+
+  scale_color_manual(values=couleurs_poster,labels = c("Sham","Stim"))+
+  scale_fill_manual(values=couleurs_alpha,labels = c("Sham","Stim"))+
+  labs(title = "SCM Score", y ="SCM Scores" ,x="")+
+  theme(plot.title = element_text(hjust=0.5))
+ggplot(mean_d5_d14,aes(Session,m_APM,color=Group,fill=Group))+theme_pubr()+
+  geom_half_violin()+geom_half_point(show.legend = F)+
+  stat_summary(aes(Session,m_APM),fun.data = "mean_se", fun.args = list(mult = 1),size=1 ,show.legend = FALSE,geom="errorbar",width=0.1,position = position_dodge(width=0.3))+
+  stat_summary(geom="point",fun="mean",size=2,position = position_dodge(width=0.3),color="black",show.legend = F)+
+  scale_color_manual(values=couleurs_poster,labels = c("Sham","Stim"))+
+  scale_fill_manual(values=couleurs_alpha,labels = c("Sham","Stim"))+
+  labs(title = "APM Score", y ="APM Scores" ,x="")+
+  theme(plot.title = element_text(hjust=0.5))
 
 
 #figure 2
-mean_d = df_APM%>%
+mean_all_days = data_APM_ScM%>%
   group_by(Pseudo,Group,Session)%>%
   summarise(m_APM=mean(APM),m_ScM=mean(ScM))
 
-mean_d$Pseudo=as.factor(mean_d$Pseudo)
-mean_d$Group=factor(mean_d$Group,levels=c("SHAM","STIMSD","STIMHD"))
-mean_d=as.data.frame(mean_d)
-mean_d=subset(mean_d,Group!="STIMSD")
-mean_d$day=1:11
+mean_all_days$Pseudo=as.factor(mean_all_days$Pseudo)
+mean_all_days$Group=factor(mean_all_days$Group,levels=c("SHAM","STIMSD","STIMHD"))
+mean_all_days=as.data.frame(mean_all_days)
+mean_all_days=subset(mean_all_days,Group!="STIMSD")
+mean_all_days$day=1:11
 
-p_APM=ggplot(mean_d,aes(day,m_APM,color=Group,shape=Group))+theme_pubr()+
+#akaike APM
+fit_ln=lm(m_APM~ln(day),data=mean_all_days) 
+fit_lin=lm(m_APM~day,data=mean_all_days)
+AIC(fit_ln)
+AIC(fit_lin) #SELECT LINEAR MODEL
+
+p_APM=ggplot(mean_all_days,aes(day,m_APM,color=Group,shape=Group))+theme_pubr()+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Référence","Entraînement & stimulation","Court terme","Long terme")),breaks=1:11)+
-  geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  geom_rect(data=mean_all_days,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
-  stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
+  stat_smooth(method=lm,formula=y~x,se=FALSE,show.legend = FALSE )+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.5))+
   labs(x="Session de Jeu",y="Appui par Minute")+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))+
-  #scale_y_continuous(breaks =seq(0, 15000, by = 2500))+
   theme(legend.position = c(0.815,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
         axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
   annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("Jour 1","Jour 2","Jour 3","Jour 4","Jour 5","Jour 15"),size=5)
 p_APM
 ggsave(plot=p_APM,"Poster\\APM_SHAM_STIMHD_allSession.pdf",device="pdf",width=10,height=6)
 
-
-p_ScM=ggplot(mean_d,aes(day,m_ScM,color=Group,shape=Group))+theme_pubr()+
+#akaike SCM
+fit_ln=lm(m_ScM~ln(day),data=mean_all_days) 
+fit_lin=lm(m_ScM~day,data=mean_all_days)
+AIC(fit_ln)
+AIC(fit_lin) #SELECT LINEAR MODEL
+p_ScM=ggplot(mean_all_days,aes(day,m_ScM,color=Group,shape=Group))+theme_pubr()+
   scale_x_continuous(sec.axis=sec_axis(~.,breaks=c(1,4.5,8.5,10.5),labels=c("Référence","Entraînement & stimulation","Court terme","Long terme")),breaks=1:11)+
-  geom_rect(data=data_long,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
+  geom_rect(data=mean_all_days,aes(xmin=1.5,xmax=7.5,ymin=-Inf,ymax=+Inf),fill="grey",alpha=0.01,inherit.aes = FALSE)+
   geom_vline(xintercept = seq(1.5,7.5,2),linetype="dotted",alpha=0.5)+geom_vline(xintercept =9.5,alpha=0.3,linetype="solid",size=0.5)+
-  stat_smooth(method=lm,formula=y~ln(x),se=FALSE,show.legend = FALSE )+
+  stat_smooth(method=lm,formula=y~x,se=FALSE,show.legend = FALSE )+
   stat_summary(geom="point",fun="mean",size=3 ,position=position_dodge(width=0.5))+
   labs(x="Session de Jeu",y="Score par Minute")+
   stat_summary(fun.data = "mean_se", fun.args = list(mult = 1),size=0.5 ,show.legend = FALSE,geom="errorbar",width=0.1 ,position=position_dodge(width=0.5))+
@@ -77,16 +117,10 @@ p_ScM=ggplot(mean_d,aes(day,m_ScM,color=Group,shape=Group))+theme_pubr()+
   theme(legend.position = c(0.815,0.15),legend.background = element_rect(fill=NA),legend.title = element_blank(),
         axis.title = element_text(size=18,margin=0.1),legend.text = element_text(size=16),text=element_text(size=16))+
   annotate("text",x=c(1,2.5,4.5,6.5,8.5,10.5),y=Inf,vjust=1.5,label=c("Jour 1","Jour 2","Jour 3","Jour 4","Jour 5","Jour 15"),size=5)
-
+p_ScM
 ggsave(plot=p_ScM,"Poster\\ScM_SHAM_STIMHD_allSession.pdf",device="pdf",width=10,height=6)
 
-
-
-#ttest
-mean_d_D5D14 = subset(mean_d, Session=="D05P2"|Session=="D14P2")
-
-
-
+#LEARNING RATES
 #####
 #LR by subScores
 #FLIGHT
@@ -411,6 +445,7 @@ plot_APM=ggplot(filter(data_long,!grepl("P1",Session)&Group!="STIMSD"),aes(D,APM
 plot_APM
 
 
+#SUBSCORES
 #####
 #FIGURE
 couleurs_poster = c("#0073C2FF","#A73030FF")
@@ -502,4 +537,3 @@ figure=(plot_spacer() + p_Flight + plot_spacer() + plot_layout(widths = c(1,2,1)
   plot_annotation(tag_levels = "a")&theme(plot.tag.position = c(0.01,0.95),plot.tag = element_text(size=12,face = 'bold'))
 figure
 
-#####
