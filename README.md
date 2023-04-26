@@ -1,9 +1,3 @@
----
-title : "ReadMe - SpaceFortress"
-author: "Caroline Hamery - ISAE-SUPAERO"
-date: "2020-2021-2022"
-output: html_document
----
 
 # Space Fortress : Data extraction, cleaning and analysis.
 
